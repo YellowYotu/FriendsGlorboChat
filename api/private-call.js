@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     
     // Секретные данные на сервере — теперь полностью в безопасности от блокировок хостинга
-    const SECRET_PASSWORD = 'glorbo_2026_glorbo'; // Изменено на безопасный формат
+    const SECRET_PASSWORD = 'glorbo_1488_glorbo'; // Изменено на безопасный формат
     const PRIVATE_MEET_URL = 'https://meet.google.com/hed-addz-ssg'; 
 
     const { password } = req.query;
