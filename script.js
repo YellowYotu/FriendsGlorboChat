@@ -40,7 +40,6 @@ async function updateSingleCallCount(callItem) {
     const meetUrl = linkElement.href;
 
     try {
-        // Запрос к нашей облачной функции на Vercel
         const response = await fetch(`/api/participants?url=${encodeURIComponent(meetUrl)}`);
         const data = await response.json();
 
@@ -69,15 +68,11 @@ function updateAllCalls() {
 
 // Загрузка страницы
 window.onload = () => {
-    // Восстановление тем из вашего старого кода
     document.body.className = localStorage.getItem('theme') || 'dark';
     if(localStorage.getItem('bColor')) {
         updateCustomStyle();
     }
     
-    // Сразу же убираем старый текст из HTML и ставим актуальный онлайн
     updateAllCalls();
-    
-    // Авто-обновление каждые 20 секунд
     setInterval(updateAllCalls, 20000); 
 };
