@@ -7,7 +7,6 @@
     <meta charset="UTF-8">
     <title>glorboChat</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Библиотека для звонков -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body class="dark">
@@ -24,25 +23,22 @@
             </button>
         </nav>
     </div>
-
     <div class="main-content">
         <div id="calls" class="page active">
-            <h1 class="page-title">Активные звонки</h1>
+            <h1 class="page-title">Звонки</h1>
             <div class="card">
-                <!-- Твой P2P блок -->
                 <div class="call-item">
                     <div>
-                        <span class="call-name">Прямая связь</span>
+                        <span class="call-name">P2P Связь</span>
                         <div id="my-peer-id" style="font-size: 0.7rem; color: var(--accent);">ID: загрузка...</div>
                     </div>
                     <button onclick="initiateCall()" class="btn-modern">Позвонить</button>
                 </div>
-                <video id="remoteVideo" autoplay playsinline style="width: 100%; border-radius: 12px; background: #000; display: none; margin-top: 15px;"></video>
+                <video id="remoteVideo" autoplay playsinline></video>
             </div>
         </div>
-
         <div id="settings" class="page">
-            <h1 class="page-title">Настройки системы</h1>
+            <h1 class="page-title">Настройки</h1>
             <div class="settings-container">
                 <div class="settings-sidebar">
                     <button onclick="showSub('theme-part')" class="sub-btn active">🎨 Тема</button>
@@ -51,22 +47,15 @@
                 </div>
                 <div class="settings-main">
                     <div id="theme-part" class="sub-page active">
-                        <h2>Выбор темы</h2>
-                        <div class="select-wrapper">
-                            <select id="theme-selector" onchange="changeTheme()">
-                                <option value="dark">Тёмная</option>
-                                <option value="light">Светлая</option>
-                                <option value="neon">Неоновая</option>
-                                <option value="cyber">Cyberpunk</option>
-                            </select>
-                        </div>
+                        <select id="theme-selector" onchange="changeTheme()">
+                            <option value="dark">Тёмная</option>
+                            <option value="light">Светлая</option>
+                            <option value="neon">Неоновая</option>
+                            <option value="cyber">Cyberpunk</option>
+                        </select>
                     </div>
                     <div id="custom-part" class="sub-page">
-                        <h2>Цвета</h2>
-                        <div class="color-picker-group">
-                            <label>Цвет кнопок:</label>
-                            <input type="color" id="btnColor" oninput="updateCustomStyle()">
-                        </div>
+                        <input type="color" id="btnColor" oninput="updateCustomStyle()">
                     </div>
                 </div>
             </div>
