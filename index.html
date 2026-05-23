@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>glorboChat</title>
     <link rel="stylesheet" href="style.css">
+    <!-- ПОДКЛЮЧАЕМ БИБЛИОТЕКУ ВИДЕОСВЯЗИ JITSI -->
+    <script src="https://jit.si"></script>
 </head>
 <body class="dark">
 
@@ -24,22 +26,26 @@
     <div class="main-content">
         <div id="calls" class="page active">
             <h1 class="page-title">Активные звонки</h1>
-            <div class="card">
+            
+            <!-- Сюда в фоновом режиме будет встраиваться окно созвона -->
+            <div id="jitsi-container"></div>
+
+            <div class="card" id="calls-list-card">
                 <div class="call-item">
                     <div>
                         <span class="call-name">Звонок 1 (Легенда)</span>
                     </div>
-                    <!--ссылка на первый созвон -->
-                    <a href="https://meet.google.com/ens-nmpk-xdc" target="_blank" class="btn-modern">Присоединиться</a>
+                    <!-- ИСПРАВЛЕНО: Теперь запускает встроенный звонок -->
+                    <button onclick="startCall('glorbo-legend-room')" class="btn-modern">Присоединиться</button>
                 </div>
                 <div class="call-item">
                     <div>
                         <span class="call-name">Звонок 2 (Новый)</span>
                     </div>
-                    <!--сылка на второй созвон -->
-                    <a href="https://meet.google.com/pka-zrfq-zoy" target="_blank" class="btn-modern">Присоединиться</a>
+                    <!-- ИСПРАВЛЕНО: Теперь запускает встроенный звонок -->
+                    <button onclick="startCall('glorbo-new-room')" class="btn-modern">Присоединиться</button>
                 </div>
-                <!-- ПРИВАТНЫЙ ЗВОНОК (Ссылка скрыта в api/private-call.js) -->
+                <!-- ПРИВАТНЫЙ ЗВОНОК -->
                 <div class="call-item">
                     <div>
                         <span class="call-name">🔒 Приватный звонок 1</span>
