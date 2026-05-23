@@ -34,10 +34,26 @@ function resetAll() {
     location.reload();
 }
 
-// Загрузка страницы и восстановление сохраненного стиля
+// Загрузка страницы и автоматическое восстановление сохраненного стиля
 window.onload = () => {
-    document.body.className = localStorage.getItem('theme') || 'dark';
+    // 1. Восстанавливаем тему
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.body.className = savedTheme;
+    
+    // Синхронизируем выпадающий список выбора темы
+    const themeSelector = document.getElementById('theme-selector');
+    if (themeSelector) themeSelector.value = savedTheme;
+
+    // 2. ИСПРАВЛЕНО: Сначала восстанавливаем сохраненные цвета в ползунках, а затем применяем их!
     if (localStorage.getItem('bColor')) {
+        document.getElementById('btnColor').value = localStorage.getItem('bColor');
+    }
+    if (localStorage.getItem('cColor')) {
+        document.getElementById('cardColor').value = localStorage.getItem('cColor');
+    }
+    
+    // Вызываем вашу функцию, которая теперь считает восстановленные цвета из ползунков и покрасит сайт
+    if (localStorage.getItem('bColor') || localStorage.getItem('cColor')) {
         updateCustomStyle();
     }
 };
