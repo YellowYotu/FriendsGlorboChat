@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <title>glorboChat</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Добавлена библиотека -->
+    <!-- Библиотека для звонков -->
     <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body class="dark">
@@ -29,9 +29,10 @@
         <div id="calls" class="page active">
             <h1 class="page-title">Активные звонки</h1>
             <div class="card">
-                <div class="call-item" id="call-1">
+                <!-- Твой P2P блок -->
+                <div class="call-item">
                     <div>
-                        <span class="call-name">P2P Звонок (Твой)</span>
+                        <span class="call-name">Прямая связь</span>
                         <div id="my-peer-id" style="font-size: 0.7rem; color: var(--accent);">ID: загрузка...</div>
                     </div>
                     <button onclick="initiateCall()" class="btn-modern">Позвонить</button>
