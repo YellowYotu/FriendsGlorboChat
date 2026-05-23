@@ -12,7 +12,7 @@ body.cyber { background: #0a0a0a; color: #ff00ff; --accent: #ffff00; --sidebar-b
 .brand { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; text-transform: lowercase; color: var(--accent); padding-left: 12px; }
 nav { display: flex; flex-direction: column; gap: 8px; }
 
-/* Красивые кнопки навигации (Слева) */
+/* Кнопки навигации (Слева) */
 .nav-btn {
     display: flex; align-items: center; gap: 14px; padding: 14px 18px;
     background: transparent; border: none; border-radius: 14px;
@@ -59,7 +59,7 @@ body.light .sub-btn:hover, body.light .sub-btn.active { background: rgba(0,0,0,0
 .sub-btn.reset { margin-top: auto; color: #ef4444; opacity: .8; }
 .sub-btn.reset:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
-/* Красивое поле выбора темы (Кастомный Select) */
+/* Поле выбора темы (Кастомный Select) */
 .select-wrapper { position: relative; max-width: 300px; }
 #theme-selector {
     width: 100%; padding: 14px 20px; font-size: 1rem; font-weight: 600; color: inherit;
@@ -71,6 +71,24 @@ body.light #theme-selector { background: rgba(0,0,0,0.02); }
 .select-wrapper::after {
     content: '▼'; font-size: 0.8rem; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
     pointer-events: none; opacity: 0.5; color: inherit;
+}
+
+/* Фикс выпадающего списка вариантов темы */
+#theme-selector option {
+    background: #1e293b;
+    color: #ffffff;
+}
+body.light #theme-selector option {
+    background: #ffffff;
+    color: #0f172a;
+}
+body.neon #theme-selector option {
+    background: #0d0614;
+    color: #00ffcc;
+}
+body.cyber #theme-selector option {
+    background: #0a0a0a;
+    color: #ff00ff;
 }
 
 /* Настройки кастомизации цвета */
