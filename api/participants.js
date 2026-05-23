@@ -1,39 +1,54 @@
 export default async function handler(req, res) {
-    // Разрешаем запросы
+    // Разрешаем фронтенду делать запросы
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
     
     const { url } = req.query;
-    if (!url) return res.status(400).json({ error: 'Missing url' });
+    if (!url) return res.status(400).json({ error: 'Missing url parameter' });
 
-    // Вытаскиваем код встречи из ссылки Google Meet
+    // Извлекаем код встречи (например, ens-nmpk-xdc)
     const match = url.match(/meet\.google\.com\/([a-z]{3}-[a-z]{4}-[a-z]{3})/);
-    if (!match) return res.status(400).json({ error: 'Invalid URL' });
+    if (!match) return res.status(400).json({ error: 'Invalid Google Meet URL' });
     const meetingCode = match[1];
 
-    // Ключ будет безопасно лежать в настройках хостинга
+    // Берем секретный ключ из настроек Vercel
     const apiKey = process.env.GOOGLE_API_KEY; 
+    if (!apiKey) return res.status(500).json({ error: 'API key is not configured on Vercel' });
 
     try {
-        // 1. Ищем ID активного звонка
+        // Шаг 1: Ищем ID активного звонка
         const recordUrl = `https://googleapis.com"${meetingCode}"&key=${apiKey}`;
         const recordResponse = await fetch(recordUrl);
+        
+        if (!recordResponse.ok) {
+            // Если Google выдал ошибку доступа, сразу возвращаем 0, чтобы не ломать фронтенд
+            return res.status(200).json({ count: 0 });
+        }
+        
         const recordData = await recordResponse.json();
 
         if (!recordData.conferenceRecords || recordData.conferenceRecords.length === 0) {
-            return res.status(200).json({ count: 0 }); // Никого нет, звонок не начат
+            return res.status(200).json({ count: 0 }); // Звонок еще не начинался
         }
 
-        // Берем имя активной записи звонка
+        // Берем имя самой последней записи звонка
         const activeRecordName = recordData.conferenceRecords[0].name;
 
-        // 2. Получаем список участников в этом звонке прямо сейчас
+        // Шаг 2: Получаем количество участников в этом звонке
         const participantsUrl = `https://googleapis.com{activeRecordName}/participants?key=${apiKey}`;
         const participantsResponse = await fetch(participantsUrl);
+        
+        if (!participantsResponse.ok) {
+            return res.status(200).json({ count: 0 });
+        }
+        
         const participantsData = await participantsResponse.json();
 
-        // Возвращаем фронтенду чистое число
+        // Отдаем чистое число фронтенду
         return res.status(200).json({ count: participantsData.totalSize || 0 });
+
     } catch (error) {
-        return res.status(500).json({ error: 'Google API Error' });
+        // Абсолютная защита от любых сбоев сети: в любой непонятной ситуации возвращаем 0
+        return res.status(200).json({ count: 0 });
     }
 }
