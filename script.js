@@ -1,8 +1,15 @@
+let currentJitsiApi = null; // Здесь хранится процесс активного созвона
+
 function showPage(id, btn) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
+    
+    // Если уходим со страницы "Звонки", автоматически выключаем камеру и микрофон
+    if (id !== 'calls' && currentJitsiApi) {
+        closeCall();
+    }
 }
 
 // Переключение подстраниц в настройках
@@ -34,22 +41,75 @@ function resetAll() {
     location.reload();
 }
 
+// --- СИСТЕМА ВСТРОЕННЫХ ЗВОНКОВ JITSI ---
+
+function startCall(roomName) {
+    // Если какой-то звонок уже активен, закрываем его
+    if (currentJitsiApi) {
+        closeCall();
+    }
+
+    const container = document.getElementById('jitsi-container');
+    const callsCard = document.getElementById('calls-list-card');
+    
+    // Скрываем карточку со списком звонков
+    callsCard.style.display = 'none';
+    container.innerHTML = ''; 
+    container.style.marginBottom = '20px';
+
+    const domain = 'meet.jit.si';
+    const options = {
+        roomName: roomName, // Уникальное имя комнаты для ваших друзей
+        width: '100%',
+        height: 550,
+        parentNode: container,
+        lang: 'ru',
+        interfaceConfigOverwrite: {
+            TOOLBAR_BUTTONS: [
+                'microphone', 'camera', 'desktop', 'fullscreen',
+                'fodeviceselection', 'hangup', 'profile', 'chat', 
+                'settings', 'raisehand', 'videoquality', 'tileview'
+            ],
+        }
+    };
+
+    // Магия! Разворачиваем видеосвязь прямо внутри вашего сайта
+    currentJitsiApi = new JitsiMeetExternalAPI(domain, options);
+
+    // Создаем красивую кнопку "Покинуть созвон" под окном видео
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'btn-modern';
+    closeBtn.style.marginTop = '15px';
+    closeBtn.style.background = '#ef4444'; // Красный цвет
+    closeBtn.textContent = '❌ Покинуть созвон';
+    closeBtn.onclick = closeCall;
+    container.appendChild(closeBtn);
+}
+
+function closeCall() {
+    if (currentJitsiApi) {
+        currentJitsiApi.dispose(); // Полностью отключаем камеру и микрофон
+        currentJitsiApi = null;
+    }
+    // Возвращаем обратно список звонков
+    document.getElementById('jitsi-container').innerHTML = '';
+    document.getElementById('calls-list-card').style.display = 'block';
+}
+
 // --- БЕЗОПАСНАЯ СИСТЕМА ДЛЯ ПРИВАТНОГО ЗВОНКА (ЧЕРЕЗ СЕРВЕР) ---
 
 async function checkPassword() {
-    // Всплывающее окно для ввода пароля
     const userPassword = prompt('Введи пароль для доступа к приватному звонку:');
-    if (!userPassword) return; // Если пользователь нажал "Отмена"
+    if (!userPassword) return; // Если нажали "Отмена"
 
     try {
-        // Отправляем пароль на скрытую серверную проверку в Vercel
         const response = await fetch(`/api/private-call?password=${encodeURIComponent(userPassword)}`);
         const data = await response.json();
 
-        if (data.success && data.url) {
-            alert('Пароль верный! Перенаправляем в звонок...');
-            // Перенаправляем в этой же вкладке, чтобы обойти блокировщики окон в браузере
-            window.location.href = data.url; 
+        if (data.success) {
+            alert('Пароль верный! Запускаем приватный звонок...');
+            // Запускаем приватную встроенную комнату Jitsi
+            startCall('glorbo-private-secret-room');
         } else {
             alert('❌ Неверный пароль! Доступ заблокирован.');
         }
