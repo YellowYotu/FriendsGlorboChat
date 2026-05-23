@@ -1,65 +1,135 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <style>
-        body { transition: opacity ease-in 0.2s; } 
-        body[unresolved] { opacity: 0; display: block; overflow: hidden; position: relative; } 
-    </style>
-    <meta charset="UTF-8">
-    <title>glorboChat</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>glorboChat</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark">
-    <div class="sidebar">
-        <h2 class="brand">glorbo</h2>
-        <nav>
-            <button class="nav-btn active" onclick="showPage('calls', this)">
-                <svg viewBox="0 0 24 24" class="nav-icon"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path></svg>
-                <span>Звонки</span>
-            </button>
-            <button class="nav-btn" onclick="showPage('settings', this)">
-                <svg viewBox="0 0 24 24" class="nav-icon"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg>
-                <span>Настройки</span>
-            </button>
-        </nav>
-    </div>
+<body>
 
-    <div class="main-content">
-        <div id="calls" class="page active">
-            <h1 class="page-title">Звонки</h1>
-            <div class="card">
-                <div class="call-item">
-                    <span>Звонок 1</span>
-                    <button class="btn-modern" onclick="initiateCall()">Присоединиться</button>
-                </div>
-                <video id="remoteVideo" autoplay playsinline style="width: 100%; border-radius: 12px; margin-top: 15px; display: none;"></video>
-            </div>
-        </div>
-
-        <div id="settings" class="page">
-            <h1 class="page-title">Настройки системы</h1>
-            <div class="settings-container">
-                <div class="settings-sidebar">
-                    <button onclick="showSub('theme-part')" class="sub-btn active">🎨 Тема</button>
-                    <button onclick="showSub('custom-part')" class="sub-btn">✨ Кастомизация</button>
-                    <button onclick="resetAll()" class="sub-btn reset">♻️ Сброс</button>
-                </div>
-                <div class="settings-main">
-                    <div id="theme-part" class="sub-page active">
-                        <h2>Выбор темы</h2>
-                        <select id="theme-selector" onchange="changeTheme()">
-                            <option value="dark">Тёмная</option>
-                            <option value="light">Светлая</option>
-                        </select>
-                    </div>
-                    <div id="custom-part" class="sub-page">
-                        <h2>Цвета</h2>
-                        <input type="color" id="btnColor" oninput="updateCustomStyle()">
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="modal-overlay" id="joinModal">
+  <div class="modal">
+    <h3>Подключиться к звонку</h3>
+    <p>Введите Peer ID участника, которому хотите позвонить</p>
+    <input type="text" id="peerInput" placeholder="Peer ID..." autocomplete="off" />
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">Отмена</button>
+      <button class="btn-primary" onclick="doCall()">Позвонить</button>
     </div>
-    <script src="script.js"></script>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <div class="brand">g<span class="brand-sub">lorbo</span></div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('calls', this)">
+      <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      <span>Звонки</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('settings', this)">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>Настройки</span>
+    </button>
+  </nav>
+</div>
+
+<div class="main">
+  <div id="calls" class="page active">
+    <div class="page-header">
+      <h1>Звонки</h1>
+      <p>Peer-to-peer видеозвонки без серверов</p>
+    </div>
+    <div class="call-card">
+      <div class="call-hero">
+        <div class="call-hero-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+        </div>
+        <h2>Звонок готов</h2>
+        <p>Нажмите «Присоединиться» и введите ID участника</p>
+        <div class="call-status">
+          <div class="dot"></div>
+          <span class="status-text" id="statusText">Подключение...</span>
+        </div>
+      </div>
+      <div class="call-actions">
+        <div class="call-info">
+          <span class="call-name">Комната 1</span>
+          <span class="call-meta">Peer-to-peer · зашифровано</span>
+        </div>
+        <button class="btn-join" onclick="openModal()">
+          <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          Присоединиться
+        </button>
+      </div>
+      <div class="peer-info">
+        <div class="peer-id-block">
+          <span class="peer-label">Ваш ID</span>
+          <span class="peer-id" id="myPeerId">…</span>
+        </div>
+        <button class="btn-copy" onclick="copyId()">Скопировать</button>
+      </div>
+      <div class="video-area" id="videoArea">
+        <div class="video-grid">
+          <div>
+            <video id="localVideo" autoplay playsinline muted></video>
+            <div class="vid-label">Вы</div>
+          </div>
+          <div>
+            <video id="remoteVideo" autoplay playsinline></video>
+            <div class="vid-label">Собеседник</div>
+          </div>
+        </div>
+        <div class="call-controls">
+          <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()" title="Микрофон">
+            <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+          </button>
+          <button class="ctrl-btn" id="camBtn" onclick="toggleCam()" title="Камера">
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+          </button>
+          <button class="ctrl-btn danger" onclick="endCall()" title="Завершить">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="currentColor"/><line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="settings" class="page">
+    <div class="page-header">
+      <h1>Настройки</h1>
+      <p>Внешний вид и параметры приложения</p>
+    </div>
+    <div class="settings-layout">
+      <div class="settings-nav">
+        <button class="sub-btn active" onclick="showSub('theme-part', this)">🎨 Тема</button>
+        <button class="sub-btn" onclick="showSub('custom-part', this)">✨ Цвета</button>
+        <button class="sub-btn reset" onclick="resetAll()">♻️ Сброс</button>
+      </div>
+      <div class="settings-panel">
+        <div id="theme-part" class="sub-page active">
+          <h2>Тема интерфейса</h2>
+          <div class="field">
+            <label>Цветовая схема</label>
+            <div class="theme-pills">
+              <button class="theme-pill active" onclick="setPill(this, 'dark')">🌑 Тёмная</button>
+              <button class="theme-pill" onclick="setPill(this, 'light')">☀️ Светлая</button>
+            </div>
+          </div>
+        </div>
+        <div id="custom-part" class="sub-page">
+          <h2>Акцентный цвет</h2>
+          <div class="field">
+            <label>Выберите цвет</label>
+            <div class="color-grid" id="colorGrid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
