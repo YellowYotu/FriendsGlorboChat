@@ -34,17 +34,34 @@ function resetAll() {
     location.reload();
 }
 
+// --- СИСТЕМА ДЛЯ ПРИВАТНОГО ЗВОНКА ---
+
+function checkPassword() {
+    // Пароль, который нужно ввести (можешь поменять его на свой внутри кавычек)
+    const SECRET_PASSWORD = 'glorbo2026';
+    
+    // Ссылка на ваш приватный созвон Google Meet
+    const PRIVATE_MEET_URL = 'https://google.com'; // Поставь сюда нужную ссылку
+    
+    // Всплывающее окно для ввода пароля
+    const userPassword = prompt('Введи пароль для доступа к приватному звонку:');
+    
+    if (userPassword === SECRET_PASSWORD) {
+        alert('Пароль верный! Перенаправляем в звонок...');
+        window.open(PRIVATE_MEET_URL, '_blank'); // Открывает созвон в новой вкладке
+    } else if (userPassword !== null) {
+        alert('❌ Неверный пароль! Доступ заблокирован.');
+    }
+}
+
 // Загрузка страницы и автоматическое восстановление сохраненного стиля
 window.onload = () => {
-    // 1. Восстанавливаем тему
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.body.className = savedTheme;
     
-    // Синхронизируем выпадающий список выбора темы
     const themeSelector = document.getElementById('theme-selector');
     if (themeSelector) themeSelector.value = savedTheme;
 
-    // 2. ИСПРАВЛЕНО: Сначала восстанавливаем сохраненные цвета в ползунках, а затем применяем их!
     if (localStorage.getItem('bColor')) {
         document.getElementById('btnColor').value = localStorage.getItem('bColor');
     }
@@ -52,7 +69,6 @@ window.onload = () => {
         document.getElementById('cardColor').value = localStorage.getItem('cColor');
     }
     
-    // Вызываем вашу функцию, которая теперь считает восстановленные цвета из ползунков и покрасит сайт
     if (localStorage.getItem('bColor') || localStorage.getItem('cColor')) {
         updateCustomStyle();
     }
