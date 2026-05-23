@@ -37,18 +37,19 @@ function resetAll() {
 // --- БЕЗОПАСНАЯ СИСТЕМА ДЛЯ ПРИВАТНОГО ЗВОНКА (ЧЕРЕЗ СЕРВЕР) ---
 
 async function checkPassword() {
-    // Всплывающее окно для ввода пароля в браузере
+    // Всплывающее окно для ввода пароля
     const userPassword = prompt('Введи пароль для доступа к приватному звонку:');
-    if (!userPassword) return; // Если пользователь нажал "Отмена" или ничего не ввёл
+    if (!userPassword) return; // Если пользователь нажал "Отмена"
 
     try {
-        // Отправляем введённый пароль на скрытую серверную проверку в Vercel
+        // Отправляем пароль на скрытую серверную проверку в Vercel
         const response = await fetch(`/api/private-call?password=${encodeURIComponent(userPassword)}`);
         const data = await response.json();
 
         if (data.success && data.url) {
             alert('Пароль верный! Перенаправляем в звонок...');
-            window.open(data.url, '_blank'); // Безопасно открываем секретную ссылку
+            // Перенаправляем в этой же вкладке, чтобы обойти блокировщики окон в браузере
+            window.location.href = data.url; 
         } else {
             alert('❌ Неверный пароль! Доступ заблокирован.');
         }
