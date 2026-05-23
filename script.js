@@ -30,7 +30,7 @@ function resetAll() {
     location.reload();
 }
 
-// --- НОВЫЙ КОД ДЛЯ ПОЛУЧЕНИЯ УЧАСТНИКОВ ОНЛАЙН ---
+// --- СИСТЕМА ОБНОВЛЕНИЯ СЧЕТЧИКОВ ОНЛАЙНА ---
 
 async function updateSingleCallCount(callItem) {
     const linkElement = callItem.querySelector('.btn-modern');
@@ -40,7 +40,7 @@ async function updateSingleCallCount(callItem) {
     const meetUrl = linkElement.href;
 
     try {
-        // Делаем безопасный запрос к нашей облачной функции
+        // Запрос к нашей облачной функции на Vercel
         const response = await fetch(`/api/participants?url=${encodeURIComponent(meetUrl)}`);
         const data = await response.json();
 
@@ -48,7 +48,7 @@ async function updateSingleCallCount(callItem) {
             const count = data.count;
             let word = 'человек';
             
-            // Склонение: 1 человек, 2 человека, 5 человек
+            // Склонение русского языка: 1 человек, 2 человека, 5 человек
             if (count % 10 === 1 && count % 100 !== 11) {
                 word = 'человек';
             } else if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) {
@@ -59,7 +59,7 @@ async function updateSingleCallCount(callItem) {
         }
     } catch (error) {
         console.error('Ошибка обновления:', error);
-        countElement.textContent = `👥 Ошибка`;
+        countElement.textContent = `👥 0 человек онлайн`;
     }
 }
 
@@ -69,13 +69,15 @@ function updateAllCalls() {
 
 // Загрузка страницы
 window.onload = () => {
-    // Ваша старая логика тем
+    // Восстановление тем из вашего старого кода
     document.body.className = localStorage.getItem('theme') || 'dark';
     if(localStorage.getItem('bColor')) {
         updateCustomStyle();
     }
     
-    // Запуск счетчиков
+    // Сразу же убираем старый текст из HTML и ставим актуальный онлайн
     updateAllCalls();
-    setInterval(updateAllCalls, 20000); // Обновляем каждые 20 секунд
+    
+    // Авто-обновление каждые 20 секунд
+    setInterval(updateAllCalls, 20000); 
 };
