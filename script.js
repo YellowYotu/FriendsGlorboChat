@@ -1,21 +1,4 @@
-// ── ACCENT SWATCHES ──
-const ACCENTS = ['#58a6ff','#3fb950','#f85149','#e3b341','#bc8cff','#ff7b72','#79c0ff','#56d364'];
-
-const cg = document.getElementById('colorGrid');
-ACCENTS.forEach(c => {
-  const s = document.createElement('div');
-  s.className = 'color-swatch' + (c === '#58a6ff' ? ' active' : '');
-  s.style.background = c;
-  s.onclick = () => {
-    document.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('active'));
-    s.classList.add('active');
-    document.documentElement.style.setProperty('--accent', c);
-    localStorage.setItem('accent', c);
-  };
-  cg.appendChild(s);
-});
-
-// ── NAVIGATION ──
+// ── НАВИГАЦИЯ ──
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -30,123 +13,166 @@ function showSub(id, btn) {
   if (btn) btn.classList.add('active');
 }
 
-function setPill(btn, theme) {
-  document.querySelectorAll('.theme-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
+// ── ТЕМЫ ──
+const THEMES = ['theme-dark','theme-light','theme-ocean','theme-purple','theme-forest','theme-sunset'];
+
+function setTheme(theme, card) {
   document.body.className = theme;
   localStorage.setItem('theme', theme);
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+  if (card) card.classList.add('active');
 }
 
-function resetAll() { localStorage.clear(); location.reload(); }
-
-// ── MODAL ──
-function openModal()  { document.getElementById('joinModal').classList.add('open'); document.getElementById('peerInput').focus(); }
-function closeModal() { document.getElementById('joinModal').classList.remove('open'); }
-
-// ── COPY ID ──
-function copyId() {
-  const id = document.getElementById('myPeerId').textContent;
-  if (id === '…') return;
-  navigator.clipboard.writeText(id).then(() => {
-    const btn = document.querySelector('.btn-copy');
-    btn.textContent = 'Скопировано!';
-    setTimeout(() => btn.textContent = 'Скопировать', 1500);
-  });
+// ── ЗВОНКИ ──
+function joinCall(url) {
+  window.open(url, '_blank');
 }
 
-// ── WEBRTC / PEERJS ──
-let peer, localStream, currentCall;
-let micOn = true, camOn = true;
+// ── ПРИВАТНЫЙ ЗВОНОК ──
+function openPrivateModal() {
+  document.getElementById('privateModal').classList.add('open');
+  document.getElementById('privatePassword').value = '';
+  document.getElementById('privateError').style.display = 'none';
+  setTimeout(() => document.getElementById('privatePassword').focus(), 200);
+}
 
-async function initMedia() {
+function closePrivateModal() {
+  document.getElementById('privateModal').classList.remove('open');
+}
+
+async function checkPrivatePassword() {
+  const password = document.getElementById('privatePassword').value.trim();
+  if (!password) return;
+
+  const btn = document.querySelector('#privateModal .btn-primary');
+  btn.textContent = '⏳ Проверка...';
+  btn.disabled = true;
+
   try {
-    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('localVideo').srcObject = localStream;
-  } catch (e) {
-    try {
-      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (e2) {
-      console.warn('Нет доступа к медиа:', e2);
+    const res = await fetch(`/api/private?password=${encodeURIComponent(password)}`);
+    const data = await res.json();
+
+    if (data.success) {
+      closePrivateModal();
+      window.open(data.url, '_blank');
+    } else {
+      const err = document.getElementById('privateError');
+      err.style.display = 'block';
+      document.getElementById('privatePassword').value = '';
+      document.getElementById('privatePassword').focus();
     }
+  } catch (e) {
+    const err = document.getElementById('privateError');
+    err.textContent = 'Ошибка подключения';
+    err.style.display = 'block';
   }
+
+  btn.textContent = 'Войти';
+  btn.disabled = false;
 }
 
-function initPeer() {
-  peer = new Peer();
-  peer.on('open', id => {
-    document.getElementById('myPeerId').textContent = id;
-    document.getElementById('statusText').textContent = 'Готов к звонку';
-  });
-  peer.on('call', call => {
-    call.answer(localStream);
-    handleStream(call);
-  });
-  peer.on('error', () => {
-    document.getElementById('statusText').textContent = 'Ошибка подключения';
-  });
+// ── КАСТОМНЫЕ СТИЛИ ──
+function openCustomModal() {
+  document.getElementById('customModal').classList.add('open');
+  loadCustomValues();
 }
 
-function handleStream(call) {
-  currentCall = call;
-  call.on('stream', s => {
-    document.getElementById('remoteVideo').srcObject = s;
-    document.getElementById('videoArea').classList.add('active');
-  });
-  call.on('close', () => {
-    document.getElementById('videoArea').classList.remove('active');
-    document.getElementById('remoteVideo').srcObject = null;
-    currentCall = null;
-  });
+function closeCustomModal() {
+  document.getElementById('customModal').classList.remove('open');
 }
 
-function doCall() {
-  const id = document.getElementById('peerInput').value.trim();
-  closeModal();
-  if (!id || !peer) return;
-  const call = peer.call(id, localStream);
-  handleStream(call);
+function loadCustomValues() {
+  const saved = JSON.parse(localStorage.getItem('customStyles') || '{}');
+  if (saved.accent) document.getElementById('customAccent').value = saved.accent;
+  if (saved.card)   document.getElementById('customCard').value   = saved.card;
+  if (saved.bg)     document.getElementById('customBg').value     = saved.bg;
+  if (saved.text)   document.getElementById('customText').value   = saved.text;
+  if (saved.radius) document.getElementById('customRadius').value = saved.radius;
+  if (saved.font)   document.getElementById('customFont').value   = saved.font;
 }
 
-function endCall() {
-  if (currentCall) currentCall.close();
-  document.getElementById('videoArea').classList.remove('active');
-  document.getElementById('remoteVideo').srcObject = null;
-  currentCall = null;
+function applyCustom() {
+  const accent = document.getElementById('customAccent').value;
+  const card   = document.getElementById('customCard').value;
+  const bg     = document.getElementById('customBg').value;
+  const text   = document.getElementById('customText').value;
+  const radius = document.getElementById('customRadius').value;
+  const font   = document.getElementById('customFont').value;
+
+  document.documentElement.style.setProperty('--accent',        accent);
+  document.documentElement.style.setProperty('--surface',       card);
+  document.documentElement.style.setProperty('--bg',            bg);
+  document.documentElement.style.setProperty('--text',          text);
+  document.documentElement.style.setProperty('--custom-radius', radius + 'px');
+  document.documentElement.style.setProperty('--custom-font',   font + 'px');
+  document.body.style.background = bg;
+  document.body.style.color = text;
+
+  const preview = document.getElementById('customPreview');
+  if (preview) preview.style.display = 'flex';
 }
 
-function toggleMute() {
-  micOn = !micOn;
-  if (localStream) localStream.getAudioTracks().forEach(t => t.enabled = micOn);
-  document.getElementById('muteBtn').style.opacity = micOn ? '1' : '0.4';
+function saveCustom() {
+  const styles = {
+    accent: document.getElementById('customAccent').value,
+    card:   document.getElementById('customCard').value,
+    bg:     document.getElementById('customBg').value,
+    text:   document.getElementById('customText').value,
+    radius: document.getElementById('customRadius').value,
+    font:   document.getElementById('customFont').value,
+  };
+  localStorage.setItem('customStyles', JSON.stringify(styles));
+  localStorage.setItem('customActive', '1');
+  closeCustomModal();
 }
 
-function toggleCam() {
-  camOn = !camOn;
-  if (localStream) localStream.getVideoTracks().forEach(t => t.enabled = camOn);
-  document.getElementById('camBtn').style.opacity = camOn ? '1' : '0.4';
+function resetCustom() {
+  localStorage.removeItem('customStyles');
+  localStorage.removeItem('customActive');
+  document.documentElement.removeAttribute('style');
+  document.body.style.cssText = '';
+  closeCustomModal();
+  applyThemeFromStorage();
 }
 
-// ── KEYBOARD SHORTCUTS ──
-document.getElementById('peerInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter')  doCall();
-  if (e.key === 'Escape') closeModal();
+function resetAll() {
+  localStorage.clear();
+  location.reload();
+}
+
+// ── ИНИЦИАЛИЗАЦИЯ ──
+function applyThemeFromStorage() {
+  const theme = localStorage.getItem('theme') || 'theme-dark';
+  document.body.className = theme;
+  const idx = THEMES.indexOf(theme);
+  const cards = document.querySelectorAll('.theme-card');
+  cards.forEach(c => c.classList.remove('active'));
+  if (cards[idx]) cards[idx].classList.add('active');
+}
+
+function applyCustomFromStorage() {
+  if (!localStorage.getItem('customActive')) return;
+  const saved = JSON.parse(localStorage.getItem('customStyles') || '{}');
+  if (saved.accent) document.documentElement.style.setProperty('--accent',        saved.accent);
+  if (saved.card)   document.documentElement.style.setProperty('--surface',       saved.card);
+  if (saved.bg)     { document.documentElement.style.setProperty('--bg', saved.bg); document.body.style.background = saved.bg; }
+  if (saved.text)   { document.documentElement.style.setProperty('--text', saved.text); document.body.style.color = saved.text; }
+  if (saved.radius) document.documentElement.style.setProperty('--custom-radius', saved.radius + 'px');
+  if (saved.font)   document.documentElement.style.setProperty('--custom-font',   saved.font + 'px');
+}
+
+// Enter / Escape в модалках
+document.getElementById('privatePassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter')  checkPrivatePassword();
+  if (e.key === 'Escape') closePrivateModal();
 });
 
-document.getElementById('joinModal').addEventListener('click', e => {
-  if (e.target === e.currentTarget) closeModal();
+document.getElementById('privateModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closePrivateModal();
+});
+document.getElementById('customModal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeCustomModal();
 });
 
-// ── INIT ──
-const savedTheme  = localStorage.getItem('theme')  || 'dark';
-const savedAccent = localStorage.getItem('accent');
-
-document.body.className = savedTheme;
-if (savedAccent) {
-  document.documentElement.style.setProperty('--accent', savedAccent);
-  document.querySelectorAll('.color-swatch').forEach(s => {
-    s.classList.toggle('active', s.style.background === savedAccent);
-  });
-}
-
-initMedia().then(() => initPeer());
-// miski
+applyThemeFromStorage();
+applyCustomFromStorage();
