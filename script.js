@@ -34,23 +34,27 @@ function resetAll() {
     location.reload();
 }
 
-// --- СИСТЕМА ДЛЯ ПРИВАТНОГО ЗВОНКА ---
+// --- БЕЗОПАСНАЯ СИСТЕМА ДЛЯ ПРИВАТНОГО ЗВОНКА (ЧЕРЕЗ СЕРВЕР) ---
 
-function checkPassword() {
-    // Пароль, который нужно ввести (можешь поменять его на свой внутри кавычек)
-    const SECRET_PASSWORD = 'glorbo2026';
-    
-    // Ссылка на ваш приватный созвон Google Meet
-    const PRIVATE_MEET_URL = 'https://google.com'; // Поставь сюда нужную ссылку
-    
-    // Всплывающее окно для ввода пароля
+async function checkPassword() {
+    // Всплывающее окно для ввода пароля в браузере
     const userPassword = prompt('Введи пароль для доступа к приватному звонку:');
-    
-    if (userPassword === SECRET_PASSWORD) {
-        alert('Пароль верный! Перенаправляем в звонок...');
-        window.open(PRIVATE_MEET_URL, '_blank'); // Открывает созвон в новой вкладке
-    } else if (userPassword !== null) {
-        alert('❌ Неверный пароль! Доступ заблокирован.');
+    if (!userPassword) return; // Если пользователь нажал "Отмена" или ничего не ввёл
+
+    try {
+        // Отправляем введённый пароль на скрытую серверную проверку в Vercel
+        const response = await fetch(`/api/private-call?password=${encodeURIComponent(userPassword)}`);
+        const data = await response.json();
+
+        if (data.success && data.url) {
+            alert('Пароль верный! Перенаправляем в звонок...');
+            window.open(data.url, '_blank'); // Безопасно открываем секретную ссылку
+        } else {
+            alert('❌ Неверный пароль! Доступ заблокирован.');
+        }
+    } catch (error) {
+        console.error('Ошибка проверки пароля:', error);
+        alert('❌ Ошибка соединения с сервером.');
     }
 }
 
