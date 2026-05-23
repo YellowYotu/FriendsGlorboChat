@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <title>glorboChat</title>
     <link rel="stylesheet" href="style.css">
-    <!-- ПОДКЛЮЧАЕМ БИБЛИОТЕКУ ВИДЕОСВЯЗИ JITSI -->
-    <script src="https://jit.si"></script>
 </head>
 <body class="dark">
-
     <div class="sidebar">
         <h2 class="brand">glorbo</h2>
         <nav>
@@ -26,30 +23,23 @@
     <div class="main-content">
         <div id="calls" class="page active">
             <h1 class="page-title">Активные звонки</h1>
-            
-            <!-- Сюда в фоновом режиме будет встраиваться окно созвона -->
-            <div id="jitsi-container"></div>
-
-            <div class="card" id="calls-list-card">
-                <div class="call-item">
+            <div class="card">
+                <div class="call-item" id="call-1">
                     <div>
                         <span class="call-name">Звонок 1 (Легенда)</span>
+                        <div class="call-status" id="status-1">🟢 Ожидание</div>
                     </div>
-                    <!-- ИСПРАВЛЕНО: Теперь запускает встроенный звонок -->
-                    <button onclick="startCall('glorbo-legend-room')" class="btn-modern">Присоединиться</button>
+                    <a href="https://meet.google.com/ens-nmpk-xdc" target="_blank" class="btn-modern" onclick="startCall(1)">Присоединиться</a>
                 </div>
-                <div class="call-item">
+                <div class="call-item" id="call-2">
                     <div>
                         <span class="call-name">Звонок 2 (Новый)</span>
+                        <div class="call-status" id="status-2">🟢 Ожидание</div>
                     </div>
-                    <!-- ИСПРАВЛЕНО: Теперь запускает встроенный звонок -->
-                    <button onclick="startCall('glorbo-new-room')" class="btn-modern">Присоединиться</button>
+                    <a href="https://meet.google.com/pka-zrfq-zoy" target="_blank" class="btn-modern" onclick="startCall(2)">Присоединиться</a>
                 </div>
-                <!-- ПРИВАТНЫЙ ЗВОНОК -->
                 <div class="call-item">
-                    <div>
-                        <span class="call-name">🔒 Приватный звонок 1</span>
-                    </div>
+                    <div><span class="call-name">🔒 Приватный звонок</span></div>
                     <button onclick="checkPassword()" class="btn-modern">Войти по паролю</button>
                 </div>
             </div>
@@ -81,16 +71,11 @@
                             <label>Цвет кнопок:</label>
                             <input type="color" id="btnColor" oninput="updateCustomStyle()">
                         </div>
-                        <div class="color-picker-group">
-                            <label>Цвет фона карточек:</label>
-                            <input type="color" id="cardColor" oninput="updateCustomStyle()">
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
