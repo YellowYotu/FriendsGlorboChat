@@ -1,9 +1,11 @@
 export default async function handler(req, res) {
+    // Разрешаем фронтенду делать запросы
     res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
     
-    // Секретные данные, которые будут храниться НА СЕРВЕРЕ. Через F12 их увидеть невозможно!
-    const SECRET_PASSWORD = 'glorbo_1488_glorbo';
-    const PRIVATE_MEET_URL = 'https://meet.google.com/hed-addz-ssg'; // Ваша секретная ссылка
+    // Секретные данные на сервере — теперь полностью в безопасности от блокировок хостинга
+    const SECRET_PASSWORD = 'glorbo_2026_glorbo'; // Изменено на безопасный формат
+    const PRIVATE_MEET_URL = 'https://meet.google.com/hed-addz-ssg'; 
 
     const { password } = req.query;
 
