@@ -186,21 +186,24 @@ document.getElementById('customModal').addEventListener('click', e => {
 });
 
 function copyLink(url, btnElement) {
+    // 1. Копируем текст
     navigator.clipboard.writeText(url).then(() => {
-        // Запоминаем старый текст
-        const originalText = btnElement.innerText;
         
-        // Меняем состояние кнопки
+        // 2. Сохраняем исходный текст ОДИН РАЗ
+        const originalText = "📋 Скопировать"; // Укажите именно тот текст, который у вас в HTML
+        
+        // 3. Меняем состояние
         btnElement.innerText = "✅ Скопировано!";
         btnElement.classList.add("copied");
 
-        // Возвращаем обратно через 2 секунды
+        // 4. Возврат через 2 секунды
         setTimeout(() => {
             btnElement.innerText = originalText;
             btnElement.classList.remove("copied");
         }, 2000);
+        
     }).catch(err => {
-        console.error('Ошибка копирования: ', err);
+        console.error('Ошибка:', err);
     });
 }
 
