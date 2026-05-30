@@ -6,6 +6,13 @@ function showPage(id, btn) {
   btn.classList.add('active');
 }
 
+// ── ВЕРСИЯ ──
+fetch('version.json')
+  .then(response => response.json())
+  .then(data => {
+    document.querySelector('.version-tag').innerText = 'version: ' + data.version;
+  });
+
 function showSub(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
