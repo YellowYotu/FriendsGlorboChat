@@ -7,11 +7,15 @@ function showPage(id, btn) {
 }
 
 // ── ВЕРСИЯ ──
-fetch('version.json')
-  .then(response => response.json())
-  .then(data => {
-    document.querySelector('.version-tag').innerText = 'version: ' + data.version;
-  });
+// Функция для автоматического обновления версии
+function loadVersion() {
+    fetch('version.json')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('versionDisplay').innerText = 'version: ' + data.version;
+        })
+        .catch(err => console.log('Не удалось загрузить версию:', err));
+}
 
 function showSub(id, btn) {
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
@@ -180,6 +184,9 @@ document.getElementById('privateModal').addEventListener('click', e => {
 document.getElementById('customModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeCustomModal();
 });
+
+// Запускаем при загрузке страницы
+loadVersion();
 
 applyThemeFromStorage();
 applyCustomFromStorage();
