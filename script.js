@@ -185,6 +185,25 @@ document.getElementById('customModal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeCustomModal();
 });
 
+function copyLink(url, btnElement) {
+    navigator.clipboard.writeText(url).then(() => {
+        // Запоминаем старый текст
+        const originalText = btnElement.innerText;
+        
+        // Меняем состояние кнопки
+        btnElement.innerText = "✅ Скопировано!";
+        btnElement.classList.add("copied");
+
+        // Возвращаем обратно через 2 секунды
+        setTimeout(() => {
+            btnElement.innerText = originalText;
+            btnElement.classList.remove("copied");
+        }, 2000);
+    }).catch(err => {
+        console.error('Ошибка копирования: ', err);
+    });
+}
+
 // Запускаем при загрузке страницы
 loadVersion();
 
