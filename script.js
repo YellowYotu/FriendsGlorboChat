@@ -7,14 +7,14 @@ function showPage(id, btn) {
 }
 
 // ── ВЕРСИЯ ──
-// Функция для автоматического обновления версии
 function loadVersion() {
-    fetch('version.json')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('versionDisplay').innerText = 'version: ' + data.version;
-        })
-        .catch(err => console.log('Не удалось загрузить версию:', err));
+    // Просто задаем версию здесь. 
+    // Это не требует запросов к серверу и обходит любые CSP ошибки
+    const APP_VERSION = "1.0.0"; 
+    const el = document.getElementById('versionDisplay');
+    if (el) {
+        el.innerText = 'version: ' + APP_VERSION;
+    }
 }
 
 function showSub(id, btn) {
