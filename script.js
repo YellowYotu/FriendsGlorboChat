@@ -8,11 +8,16 @@ function showPage(id, btn) {
 
 // ── ВЕРСИЯ ──
 function loadVersion() {
-    const APP_VERSION = "1.0.0";
-    const el = document.getElementById('versionDisplay');
-    if (el) {
-        el.innerText = 'version: ' + APP_VERSION;
-    }
+    fetch('/version.json')
+        .then(res => res.json())
+        .then(data => {
+            const el = document.getElementById('versionDisplay');
+            if (el) el.innerText = 'version: ' + data.version;
+        })
+        .catch(() => {
+            const el = document.getElementById('versionDisplay');
+            if (el) el.innerText = 'version: ???';
+        });
 }
 
 function showSub(id, btn) {
