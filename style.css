@@ -313,3 +313,27 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
     pointer-events: none; /* Чтобы текст не перекрывал клики, если что */
     z-index: 1000;
 }
+
+/* ── COPY ── */
+.btn-copy {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.btn-copy:hover {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-copy.copied {
+    background: #238636;
+    border-color: #238636;
+    color: white;
+}
