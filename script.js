@@ -8,9 +8,7 @@ function showPage(id, btn) {
 
 // ── ВЕРСИЯ ──
 function loadVersion() {
-    // Просто задаем версию здесь. 
-    // Это не требует запросов к серверу и обходит любые CSP ошибки
-    const APP_VERSION = "1.0.0"; 
+    const APP_VERSION = "1.0.0";
     const el = document.getElementById('versionDisplay');
     if (el) {
         el.innerText = 'version: ' + APP_VERSION;
@@ -207,8 +205,8 @@ function copyLink(url, btnElement) {
     });
 }
 
-// Запускаем при загрузке страницы
-loadVersion();
-
 applyThemeFromStorage();
 applyCustomFromStorage();
+
+// Запускаем
+loadVersion();
