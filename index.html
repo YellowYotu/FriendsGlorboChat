@@ -24,22 +24,6 @@
     </div>
   </div>
 </div>
-<!-- MODAL: публичний звонок -->
-  <div class="call-card public">
-  <div class="call-card-top">
-    <div class="call-badge public-badge" style="background: #238636;">🌐 Публичный</div>
-    <div class="call-live"><span class="live-dot green"></span>Open</div>
-  </div>
-  <div class="call-card-body">
-    <div class="call-avatar">🌍</div>
-    <h2>Публичный звонок 1</h2>
-    <p>Свободный вход без принятия</p>
-  </div>
-  <button class="btn-join" onclick="window.open('https://meet.google.com/vww-gpxv-qwd', '_blank')">
-    <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-    Присоединиться
-  </button>
-</div>
 
 <!-- MODAL: кастомные стили -->
 <div class="modal-overlay" id="customModal">
@@ -156,6 +140,31 @@
           Войти с паролем
         </button>
       </div>
+
+      <!-- MODAL: публичний звонок -->
+<div class="calls-grid">
+
+  <div class="call-card legend">...</div>
+
+  <div class="call-card new">...</div>
+
+  <div class="call-card private">...</div>
+
+  <div class="call-card public">
+    <div class="call-card-top">
+      <div class="call-badge" style="background: #238636;">🌐 Публичный</div>
+      <div class="call-live"><span class="live-dot green"></span>Open</div>
+    </div>
+    <div class="call-card-body">
+      <div class="call-avatar">🌍</div>
+      <h2>Публичный звонок 1</h2>
+      <p>Свободный вход без принятия</p>
+    </div>
+    <button class="btn-join" onclick="joinCall('https://meet.google.com/vww-gpxv-qwd')">
+      Присоединиться
+    </button>
+  </div>
+  </div>
 
     </div>
   </div>
