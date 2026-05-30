@@ -90,74 +90,67 @@
 
     <div class="calls-grid">
 
-      <!-- Звонок 1 — легенда -->
-      <div class="call-card legend">
-        <div class="call-card-top">
-          <div class="call-badge">👑 Легенда</div>
-          <div class="call-live"><span class="live-dot"></span>Live</div>
-        </div>
-        <div class="call-card-body">
-          <div class="call-avatar">🎙️</div>
-          <h2>Звонок 1</h2>
-          <p>Оригинальная комната — здесь всё началось</p>
-        </div>
-        <button class="btn-join legend-btn" onclick="joinCall('https://meet.google.com/ens-nmpk-xdc')">
-          <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-          Присоединиться
-        </button>
-      </div>
+  <div class="call-card legend">
+    <div class="call-card-top">
+      <div class="call-badge">👑 Легенда</div>
+      <div class="call-live"><span class="live-dot"></span>Live</div>
+    </div>
+    <div class="call-card-body">
+      <div class="call-avatar">🎙️</div>
+      <h2>Звонок 1</h2>
+      <p>Оригинальная комната — здесь всё началось</p>
+    </div>
+    <button class="btn-join legend-btn" onclick="joinCall('https://meet.google.com/ens-nmpk-xdc')">
+      Присоединиться
+    </button>
+  </div>
 
-      <!-- Звонок 2 — новый -->
-      <div class="call-card new">
-        <div class="call-card-top">
-          <div class="call-badge new-badge">✨ Новый</div>
-          <div class="call-live"><span class="live-dot green"></span>Live</div>
-        </div>
-        <div class="call-card-body">
-          <div class="call-avatar">🚀</div>
-          <h2>Звонок 2</h2>
-          <p>Новая комната — свежее начало</p>
-        </div>
-        <button class="btn-join new-btn" onclick="joinCall('https://meet.google.com/pka-zrfq-zoy')">
-          <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-          Присоединиться
-        </button>
-      </div>
+  <div class="call-card new">
+    <div class="call-card-top">
+      <div class="call-badge new-badge">✨ Новый</div>
+      <div class="call-live"><span class="live-dot green"></span>Live</div>
+    </div>
+    <div class="call-card-body">
+      <div class="call-avatar">🚀</div>
+      <h2>Звонок 2</h2>
+      <p>Новая комната — свежее начало</p>
+    </div>
+    <button class="btn-join new-btn" onclick="joinCall('https://meet.google.com/pka-zrfq-zoy')">
+      Присоединиться
+    </button>
+  </div>
 
-      <!-- Приватный звонок -->
-      <div class="call-card private">
-        <div class="call-card-top">
-          <div class="call-badge private-badge">🔒 Приватный</div>
-          <div class="call-live"><span class="live-dot red"></span>Закрыт</div>
-        </div>
-        <div class="call-card-body">
-          <div class="call-avatar">🛡️</div>
-          <h2>Приватный звонок 1</h2>
-          <p>Только для своих — нужен пароль</p>
-        </div>
-        <button class="btn-join private-btn" onclick="openPrivateModal()">
-          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-          Войти с паролем
-        </button>
-      </div>
+  <div class="call-card private">
+    <div class="call-card-top">
+      <div class="call-badge private-badge">🔒 Приватный</div>
+      <div class="call-live"><span class="live-dot red"></span>Закрыт</div>
+    </div>
+    <div class="call-card-body">
+      <div class="call-avatar">🛡️</div>
+      <h2>Приватный звонок 1</h2>
+      <p>Только для своих — нужен пароль</p>
+    </div>
+    <button class="btn-join private-btn" onclick="openPrivateModal()">
+      Войти с паролем
+    </button>
   </div>
-          <!-- Публичний звонок -->
-    <div class="call-card public">
-  <div class="call-card-top">
-    <div class="call-badge" style="background: #238636;">🌐 Публичный</div>
-    <div class="call-live"><span class="live-dot green"></span>Open</div>
+
+  <div class="call-card public">
+    <div class="call-card-top">
+      <div class="call-badge" style="background: #238636;">🌐 Публичный</div>
+      <div class="call-live"><span class="live-dot green"></span>Open</div>
+    </div>
+    <div class="call-card-body">
+      <div class="call-avatar">🌍</div>
+      <h2>Публичный звонок 1</h2>
+      <p>Свободный вход без принятия</p>
+    </div>
+    <button class="btn-join" onclick="joinCall('https://meet.google.com/vww-gpxv-qwd')">
+      Присоединиться
+    </button>
   </div>
-  <div class="call-card-body">
-    <div class="call-avatar">🌍</div>
-    <h2>Публичный звонок 1</h2>
-    <p>Свободный вход без принятия</p>
-  </div>
-  <button class="btn-join" onclick="joinCall('https://meet.google.com/vww-gpxv-qwd')">
-    Присоединиться
-  </button>
+
 </div>
-    
-  </div>
 
   <!-- НАСТРОЙКИ -->
   <div id="settings" class="page">
