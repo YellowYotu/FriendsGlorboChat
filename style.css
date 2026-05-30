@@ -302,3 +302,14 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
   border-radius: var(--custom-radius, 10px); color: #fff;
   font-size: var(--custom-font, 14px); font-weight: 600; cursor: pointer;
 }
+/* ── VERSION ── */
+.version-tag {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    color: var(--muted); /* Используем цвет текста из ваших переменных */
+    font-size: 12px;
+    opacity: 0.6; /* Сделаем чуть бледнее, чтобы не отвлекало */
+    pointer-events: none; /* Чтобы текст не перекрывал клики, если что */
+    z-index: 1000;
+}
