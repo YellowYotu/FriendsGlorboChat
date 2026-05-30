@@ -6,7 +6,7 @@ function showPage(id, btn) {
   btn.classList.add('active');
 }
 
-// ── ВЕРСИЯ ──
+// ── версия ──
 function loadVersion() {
     fetch('/version.json')
         .then(res => res.json())
