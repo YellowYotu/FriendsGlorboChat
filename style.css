@@ -302,38 +302,139 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
   border-radius: var(--custom-radius, 10px); color: #fff;
   font-size: var(--custom-font, 14px); font-weight: 600; cursor: pointer;
 }
+
 /* ── VERSION ── */
 .version-tag {
-    position: fixed;
-    bottom: 15px;
-    right: 15px;
-    color: var(--muted); /* Используем цвет текста из ваших переменных */
-    font-size: 12px;
-    opacity: 0.6; /* Сделаем чуть бледнее, чтобы не отвлекало */
-    pointer-events: none; /* Чтобы текст не перекрывал клики, если что */
-    z-index: 1000;
+  position: fixed; bottom: 15px; right: 15px;
+  color: var(--muted); font-size: 12px;
+  opacity: 0.6; pointer-events: none; z-index: 1000;
 }
 
 /* ── COPY ── */
 .btn-copy {
-    background: transparent;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 12px;
-    margin-top: 10px;
-    transition: 0.3s;
+  background: transparent; border: 1px solid var(--accent);
+  color: var(--accent); padding: 8px; border-radius: 6px;
+  cursor: pointer; font-size: 12px; margin-top: 10px; transition: 0.3s;
+}
+.btn-copy:hover { background: var(--accent); color: white; }
+.btn-copy.copied { background: #238636; border-color: #238636; color: white; }
+
+
+/* ════════════════════════════════════════
+   ── МОБИЛЬНАЯ ВЕРСИЯ ──
+   ════════════════════════════════════════ */
+
+/* Планшеты (до 768px) */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    height: 100dvh; /* dvh учитывает адресную строку браузера на телефоне */
+    overflow: hidden;
+  }
+
+  /* Сайдбар превращается в нижнюю навигацию */
+  .sidebar {
+    width: 100% !important;
+    height: 64px;
+    flex-direction: row;
+    padding: 0 16px;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    order: 2; /* идёт после .main */
+    gap: 0;
+    justify-content: space-around;
+    overflow: visible;
+  }
+
+  /* Бренд прячем на мобиле — нет места */
+  .brand { display: none; }
+
+  nav {
+    flex-direction: row;
+    width: 100%;
+    padding: 0;
+    gap: 0;
+    justify-content: space-around;
+  }
+
+  .nav-btn {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    font-size: 11px;
+    border-radius: 8px;
+    flex: 1;
+  }
+
+  /* На мобиле текст всегда виден */
+  .nav-btn span {
+    opacity: 1 !important;
+    font-size: 11px;
+  }
+
+  .nav-btn svg { width: 22px; height: 22px; }
+
+  /* Основной контент занимает всё место сверху */
+  .main {
+    flex: 1;
+    order: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* плавный скролл на iOS */
+  }
+
+  /* Меньше отступы на мобиле */
+  .page { padding: 20px 16px 16px; }
+
+  .page-header { margin-bottom: 20px; }
+  .page-header h1 { font-size: 20px; }
+
+  /* Карточки в 1 колонку */
+  .calls-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Настройки — вертикально */
+  .settings-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .settings-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+
+  .sub-btn {
+    white-space: nowrap;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  /* Темы — 2 колонки вместо 3 */
+  .themes-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Модалки на всю ширину */
+  .modal { width: calc(100vw - 32px) !important; padding: 24px 20px; }
+  .modal-wide { width: calc(100vw - 32px) !important; }
+
+  /* Кнопки крупнее для пальца */
+  .btn-join { padding: 15px; font-size: 15px; }
+  .btn-copy { padding: 10px; font-size: 13px; width: calc(100% - 40px); margin: 0 20px 16px; }
+
+  /* Версия — подальше от нижней панели */
+  .version-tag { bottom: 74px; right: 12px; }
 }
 
-.btn-copy:hover {
-    background: var(--accent);
-    color: white;
-}
-
-.btn-copy.copied {
-    background: #238636;
-    border-color: #238636;
-    color: white;
+/* Телефоны (до 480px) — дополнительные правки */
+@media (max-width: 480px) {
+  .call-avatar { font-size: 36px; }
+  .call-card-body h2 { font-size: 16px; }
+  .settings-panel { padding: 16px; }
+  .themes-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .custom-grid { grid-template-columns: 1fr; } /* цвета в 1 колонку */
 }
