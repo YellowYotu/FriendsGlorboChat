@@ -828,21 +828,62 @@ user-select: none;
 
     height: calc(100dvh - 220px);
 
-    min-height: 500px;
+    min-height: 0;
 
     overflow: hidden;
 
     border-radius: 34px;
 
-    background:
+    background: rgba(255,255,255,.02);
 
-        rgba(255,255,255,.02);
-
-    backdrop-filter:
-
-        blur(30px);
+    backdrop-filter: blur(30px);
 
 }
+
+.chat {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-height: 0;
+
+}
+
+.chat-messages {
+
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding: 26px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+}
+
+.chat-send {
+
+    flex-shrink: 0;
+
+    padding: 20px;
+
+    display: flex;
+
+    gap: 12px;
+
+}
+
 
 .dialogs{
 
