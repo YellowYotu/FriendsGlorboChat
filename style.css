@@ -1194,3 +1194,71 @@ font-size:12px;
     }
 
 }
+
+/* ===========================
+   CHAT SCROLLBAR
+=========================== */
+
+.chat-messages {
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(255,140,60,.65)
+        transparent;
+
+}
+
+/* Chrome / Edge */
+
+.chat-messages::-webkit-scrollbar {
+
+    width: 12px;
+
+}
+
+.chat-messages::-webkit-scrollbar-track {
+
+    background:
+        transparent;
+
+    margin: 12px;
+
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,140,60,.95),
+            rgba(255,110,40,.8)
+        );
+
+    border-radius: 999px;
+
+    border: 3px solid transparent;
+
+    background-clip: padding-box;
+
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,170,90,1),
+            rgba(255,130,60,1)
+        );
+
+    background-clip: padding-box;
+
+}
+
+.chat-messages::-webkit-scrollbar-corner {
+
+    background:
+        transparent;
+
+}
