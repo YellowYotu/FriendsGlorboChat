@@ -32,6 +32,7 @@ const THEMES = ['theme-dark','theme-light','theme-ocean','theme-purple','theme-f
 function setTheme(theme, card) {
   document.body.className = theme;
   localStorage.setItem('theme', theme);
+  showCurrentUser();
   document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
   if (card) card.classList.add('active');
 }
@@ -224,6 +225,688 @@ function copyLink(url, btnElement) {
         console.error('Ошибка:', err);
     });
 }
+
+/* ═══════════════════════════════
+   LOGIN / REGISTER
+═══════════════════════════════ */
+
+let registerMode = false;
+
+function animateLogo() {
+
+    const logo =
+        document.querySelector(
+            '.login-logo'
+        );
+
+    if (!logo) {
+        return;
+    }
+
+    logo.classList.remove(
+        'logo-jump'
+    );
+
+    void logo.offsetWidth;
+
+    logo.classList.add(
+        'logo-jump'
+    );
+}
+
+function animateTitle() {
+
+    const title =
+        document.getElementById(
+            'authTitle'
+        );
+
+    if (!title) {
+        return;
+    }
+
+    title.classList.remove(
+        'title-animate'
+    );
+
+    void title.offsetWidth;
+
+    title.classList.add(
+        'title-animate'
+    );
+}
+
+function buildLoginFields() {
+
+    return `
+        <input
+            class="login-input"
+            id="loginNickname"
+            placeholder="Никнейм"
+            autocomplete="off"
+        >
+
+        <input
+            class="login-input"
+            id="loginPassword"
+            type="password"
+            placeholder="Пароль"
+        >
+    `;
+}
+
+function buildRegisterFields() {
+
+    return `
+        <input
+            class="login-input"
+            id="registerNickname"
+            placeholder="Никнейм"
+            autocomplete="off"
+        >
+
+        <input
+            class="login-input"
+            id="registerPassword"
+            type="password"
+            placeholder="Пароль"
+        >
+
+        <input
+            class="login-input"
+            id="registerPasswordRepeat"
+            type="password"
+            placeholder="Повторите пароль"
+        >
+    `;
+}
+
+function toggleAuth() {
+
+    const content =
+        document.getElementById(
+            'authContent'
+        );
+
+    const title =
+        document.getElementById(
+            'authTitle'
+        );
+
+    const fields =
+        document.getElementById(
+            'authFields'
+        );
+
+    const switchText =
+        document.getElementById(
+            'authSwitchText'
+        );
+
+    const action =
+        document.getElementById(
+            'mainAction'
+        );
+
+    const switchBtn =
+        document.getElementById(
+            'switchBtn'
+        );
+
+    if (
+        !content ||
+        !title ||
+        !fields ||
+        !switchText ||
+        !action ||
+        !switchBtn
+    ) {
+        return;
+    }
+
+    content.classList.add(
+        'switching'
+    );
+
+    setTimeout(() => {
+
+        registerMode =
+            !registerMode;
+
+        animateLogo();
+
+        if (registerMode) {
+
+            title.textContent =
+                'Создание аккаунта';
+
+            fields.innerHTML =
+                buildRegisterFields();
+
+            action.textContent =
+                'Создать аккаунт';
+
+            action.onclick =
+                createAccount;
+
+            switchText.textContent =
+                'Уже есть аккаунт?';
+
+            switchBtn.textContent =
+                'Войти';
+
+        } else {
+
+            title.textContent =
+                'Вход';
+
+            fields.innerHTML =
+                buildLoginFields();
+
+            action.textContent =
+                'Войти';
+
+            action.onclick =
+                login;
+
+            switchText.textContent =
+                'Нету аккаунта?';
+
+            switchBtn.textContent =
+                'Создать аккаунт';
+        }
+
+        animateTitle();
+
+        content.classList.remove(
+            'switching'
+        );
+
+    }, 160);
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+
+        const fields =
+            document.getElementById(
+                'authFields'
+            );
+
+        const action =
+            document.getElementById(
+                'mainAction'
+            );
+
+        if (fields) {
+
+            fields.innerHTML =
+                buildLoginFields();
+        }
+
+        if (action) {
+
+            action.onclick =
+                login;
+}
+
+    }
+);
+
+async function createAccount() {
+
+    const nickname =
+        document
+            .getElementById(
+                'registerNickname'
+            )
+            ?.value
+            .trim();
+
+    const password =
+        document
+            .getElementById(
+                'registerPassword'
+            )
+            ?.value;
+
+    const repeat =
+        document
+            .getElementById(
+                'registerPasswordRepeat'
+            )
+            ?.value;
+
+    if (
+        !nickname ||
+        !password
+    ) {
+
+        alert(
+            'Заполни все поля'
+        );
+
+        return;
+    }
+
+    if (
+        password !==
+        repeat
+    ) {
+
+        alert(
+            'Пароли не совпадают'
+        );
+
+        return;
+    }
+
+    try {
+
+        const existing =
+            await db
+                .collection(
+                    'users'
+                )
+                .where(
+                    'nickname',
+                    '==',
+                    nickname
+                )
+                .get();
+
+        if (
+            !existing.empty
+        ) {
+
+            alert(
+                'Ник уже занят'
+            );
+
+            return;
+        }
+
+        await db
+            .collection(
+                'users'
+            )
+            .add({
+
+                nickname,
+
+                password,
+
+                createdAt:
+                    Date.now()
+            });
+
+        alert(
+            'Аккаунт создан'
+        );
+
+        toggleAuth();
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            'Ошибка Firebase'
+        );
+    }
+}
+
+async function login() {
+
+    clearAuthError();
+
+    const nickname =
+        document
+            .getElementById(
+                'loginNickname'
+            )
+            ?.value
+            .trim();
+
+    const password =
+        document
+            .getElementById(
+                'loginPassword'
+            )
+            ?.value;
+
+    if (
+        !nickname
+    ) {
+
+        showAuthError(
+            'Введите ник',
+            'loginNickname'
+        );
+
+        return;
+    }
+
+    if (
+        !password
+    ) {
+
+        showAuthError(
+            'Введите пароль',
+            'loginPassword'
+        );
+
+        return;
+    }
+
+    try {
+
+        const result =
+            await db
+                .collection(
+                    'users'
+                )
+                .where(
+                    'nickname',
+                    '==',
+                    nickname
+                )
+                .limit(
+                    1
+                )
+                .get();
+
+        if (
+            result.empty
+        ) {
+
+            showAuthError(
+                'Такого аккаунта нет',
+                'loginNickname'
+            );
+
+            return;
+        }
+
+        const user =
+            result.docs[0].data();
+
+        if (
+            user.password !==
+            password
+        ) {
+
+            showAuthError(
+                'Неверный пароль',
+                'loginPassword'
+            );
+
+            return;
+        }
+
+        localStorage.setItem(
+            'currentUser',
+            JSON.stringify(
+                user
+            )
+        );
+
+        showCurrentUser();
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+        showAuthError(
+            'Ошибка входа'
+        );
+    }
+}
+
+function clearAuthError() {
+
+    const error =
+        document.getElementById(
+            'authError'
+        );
+
+    if (error) {
+
+        error.textContent =
+            '';
+    }
+
+    document
+        .querySelectorAll(
+            '.login-input'
+        )
+        .forEach(
+            input =>
+                input.classList.remove(
+                    'error'
+                )
+        );
+}
+
+function showAuthError(
+    message,
+    inputId
+) {
+
+    clearAuthError();
+
+    const error =
+        document.getElementById(
+            'authError'
+        );
+
+    if (error) {
+
+        error.textContent =
+            message;
+    }
+
+    if (inputId) {
+
+        const input =
+            document.getElementById(
+                inputId
+            );
+
+        if (input) {
+
+            input.classList.add(
+                'error'
+            );
+        }
+    }
+}
+
+function showCurrentUser() {
+
+    const raw =
+        localStorage.getItem(
+            'currentUser'
+        );
+
+    if (
+        !raw
+    ) {
+        return;
+    }
+
+    const user =
+        JSON.parse(
+            raw
+        );
+
+    document
+        .getElementById(
+            'loginScreen'
+        )
+        ?.style &&
+        (
+            document
+                .getElementById(
+                    'loginScreen'
+                )
+                .style
+                .display =
+                'none'
+        );
+
+    const old =
+        document.getElementById(
+            'profileBar'
+        );
+
+    if (
+        old
+    ) {
+
+        old.remove();
+    }
+
+    document.body.insertAdjacentHTML(
+        'beforeend',
+
+`
+<div id="profileBar">
+
+<div id="profileName">
+${user.nickname}
+</div>
+
+<div id="profileAvatar">
+${user.nickname[0].toUpperCase()}
+</div>
+
+</div>
+`
+    );
+}
+
+window.addEventListener(
+    'load',
+    () => {
+
+        showCurrentUser();
+    }
+);
+
+function logout() {
+
+    localStorage.removeItem(
+        'currentUser'
+    );
+
+    document
+        .getElementById(
+            'profileBar'
+        )
+        ?.remove();
+
+    const loginScreen =
+        document
+            .getElementById(
+                'loginScreen'
+            );
+
+    if (
+        loginScreen
+    ) {
+
+        loginScreen.style.display =
+            'flex';
+    }
+
+    registerMode =
+        false;
+
+    const title =
+        document
+            .getElementById(
+                'authTitle'
+            );
+
+    const fields =
+        document
+            .getElementById(
+                'authFields'
+            );
+
+    const action =
+        document
+            .getElementById(
+                'mainAction'
+            );
+
+    const switchText =
+        document
+            .getElementById(
+                'authSwitchText'
+            );
+
+    const switchBtn =
+        document
+            .getElementById(
+                'switchBtn'
+            );
+
+    if (
+        title
+    ) {
+
+        title.textContent =
+            'Вход';
+    }
+
+    if (
+        fields
+    ) {
+
+        fields.innerHTML =
+            buildLoginFields();
+    }
+
+    if (
+        action
+    ) {
+
+        action.textContent =
+            'Войти';
+
+        action.onclick =
+            () => login();
+    }
+
+    if (
+        switchText
+    ) {
+
+        switchText.textContent =
+            'Нету аккаунта?';
+    }
+
+    if (
+        switchBtn
+    ) {
+
+        switchBtn.textContent =
+            'Создать аккаунт';
+    }
+}
+
+
 
 applyThemeFromStorage();
 applyCustomFromStorage();

@@ -10,6 +10,55 @@
 </head>
 <body class="theme-dark">
 
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+
+  <div class="login-card">
+
+    <div class="login-logo">
+      <span class="brand-g">g</span>lorbo
+    </div>
+
+    <div id="authContent">
+
+      <h1 id="authTitle">Вход</h1>
+
+
+      <div id="authFields">
+      <div id="authError"></div>
+        <input
+          id="loginNickname"
+          class="login-input"
+          placeholder="Никнейм"
+          autocomplete="off"
+        >
+
+        <input
+          id="loginPassword"
+          class="login-input"
+          type="password"
+          placeholder="Пароль"
+        >
+      </div>
+
+      <button id="mainAction" class="login-btn">
+        Войти
+      </button>
+
+      <div id="authSwitchText" class="login-footer">
+        Нету аккаунта?
+      </div>
+
+      <button id="switchBtn" class="register-btn" onclick="toggleAuth()">
+        Создать аккаунт
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
 <!-- MODAL: пароль для приватного звонка -->
 <div class="modal-overlay" id="privateModal">
   <div class="modal">
@@ -262,6 +311,27 @@
           </div>
         </div>
 
+        <div style="margin-top:24px">
+
+<h2>Аккаунт</h2>
+
+<p style="color:var(--muted);margin-bottom:14px">
+
+Выход из текущего аккаунта
+
+</p>
+
+<button
+class="btn-join private-btn"
+onclick="logout()"
+>
+
+Выйти из аккаунта
+
+</button>
+
+</div>
+
       </div>
     </div>
   </div>
@@ -270,6 +340,12 @@
   
   <!-- ВЕРСИЯ -->
 <div class="version-tag" id="versionDisplay">version: ...</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+
+<script src="firebase.js"></script>
 
 <script src="script.js"></script>
 
