@@ -1,3 +1,4 @@
+// firebasa
 const firebaseConfig = {
   apiKey: "AIzaSyBlcioHwHMz9oEPxv9mIML50nbVB3UvF6Q",
   authDomain: "friendsglorbochat.firebaseapp.com",
