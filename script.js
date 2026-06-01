@@ -1221,6 +1221,7 @@ async function sendMessage() {
 async function loadMessages() {
 
     const chat =
+
         document.getElementById(
             'chatMessages'
         );
@@ -1230,6 +1231,16 @@ async function loadMessages() {
     ) {
 
         return;
+
+    }
+
+    if (
+
+        unsubscribeMessages
+
+    ) {
+
+        unsubscribeMessages();
 
     }
 
@@ -1247,120 +1258,135 @@ async function loadMessages() {
 
     }
 
-    let owner =
-        user.nickname;
+    let query =
+
+        db
+            .collection(
+                'messages'
+            );
 
     if (
 
         user.nickname ===
         'YellowYotu'
 
+        &&
+
+        currentReplyUser
+
     ) {
 
-        owner =
-            currentReplyUser;
+        query =
+
+            query
+
+                .where(
+                    'owner',
+                    '==',
+                    currentReplyUser
+                )
+
+                .where(
+                    'dialog',
+                    '==',
+                    currentDialog
+                );
 
     }
 
-    if (
-        !owner
-    ) {
+    else {
 
-        chat.innerHTML =
+        query =
 
-`
-<div class="msg left">
+            query
 
-Выберите диалог
+                .where(
+                    'owner',
+                    '==',
+                    user.nickname
+                )
 
-</div>
-`;
-
-        return;
+                .where(
+                    'dialog',
+                    '==',
+                    currentDialog
+                );
 
     }
 
-    const snapshot =
+    unsubscribeMessages =
 
-        await db
-
-            .collection(
-                'messages'
-            )
-
-            .where(
-                'owner',
-                '==',
-                owner
-            )
-
-            .where(
-                'dialog',
-                '==',
-                currentDialog
-            )
+        query
 
             .orderBy(
                 'createdAt'
             )
 
-            .get();
+            .onSnapshot(
 
-    snapshot.forEach(
+                snapshot => {
 
-        doc => {
+                    chat.innerHTML =
+                        '';
 
-            const m =
-                doc.data();
+                    snapshot.forEach(
 
-            const side =
+                        doc => {
 
-                m.sender ===
-                user.nickname
+                            const msg =
+                                doc.data();
 
-                ?
+                            const mine =
 
-                'right'
+                                msg.sender ===
+                                user.nickname;
 
-                :
-
-                'left';
-
-            chat.innerHTML +=
+                            chat.innerHTML +=
 
 `
 
 <div
-class="
-msg
-${side}
+
+class="msg
+
+${
+
+mine
+
+?
+
+'right'
+
+:
+
+'left'
+
+}
+
 "
+
 >
 
-<div
-style="
-opacity:.5;
-font-size:12px;
-margin-bottom:8px;
-"
->
+<div>
 
-${m.sender}
+${msg.text}
 
 </div>
-
-${m.text}
 
 </div>
 
 `;
 
-        }
+                        }
 
-    );
+                    );
 
-    chat.scrollTop =
-        chat.scrollHeight;
+                    chat.scrollTop =
+                        chat.scrollHeight;
+
+                }
+
+            );
 
 }
 
