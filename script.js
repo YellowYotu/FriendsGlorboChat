@@ -976,6 +976,8 @@ let currentDialog =
 let currentReplyUser =
     null;
 
+let unsubscribeMessages =
+    null;
 
 /* ==========================
    USER
