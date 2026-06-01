@@ -1262,3 +1262,31 @@ font-size:12px;
         transparent;
 
 }
+
+
+.brand-g {
+
+    color: var(--accent);
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+.brand-logo {
+
+    width: 30px;
+
+    height: 30px;
+
+    object-fit: contain;
+
+    vertical-align: middle;
+
+    transform:
+        translateY(2px);
+
+}
