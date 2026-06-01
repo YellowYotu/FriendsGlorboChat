@@ -102,6 +102,14 @@ function loadCustomValues() {
   if (saved.text)   document.getElementById('customText').value   = saved.text;
   if (saved.radius) document.getElementById('customRadius').value = saved.radius;
   if (saved.font)   document.getElementById('customFont').value   = saved.font;
+  if (saved.scale)  document.getElementById('customScale').value  = saved.scale;
+  // Обновляем лейбл масштаба
+  updateScaleLabel(saved.scale || 100);
+}
+
+function updateScaleLabel(val) {
+  const label = document.getElementById('scaleLabel');
+  if (label) label.textContent = val + '%';
 }
 
 function applyCustom() {
@@ -111,6 +119,7 @@ function applyCustom() {
   const text   = document.getElementById('customText').value;
   const radius = document.getElementById('customRadius').value;
   const font   = document.getElementById('customFont').value;
+  const scale  = document.getElementById('customScale').value;
 
   document.documentElement.style.setProperty('--accent',        accent);
   document.documentElement.style.setProperty('--surface',       card);
@@ -120,6 +129,13 @@ function applyCustom() {
   document.documentElement.style.setProperty('--custom-font',   font + 'px');
   document.body.style.background = bg;
   document.body.style.color = text;
+
+  // Применяем масштаб к основному контенту
+  const main = document.querySelector('.main');
+  if (main) main.style.zoom = (scale / 100);
+
+  // Обновляем лейбл
+  updateScaleLabel(scale);
 
   const preview = document.getElementById('customPreview');
   if (preview) preview.style.display = 'flex';
@@ -133,6 +149,7 @@ function saveCustom() {
     text:   document.getElementById('customText').value,
     radius: document.getElementById('customRadius').value,
     font:   document.getElementById('customFont').value,
+    scale:  document.getElementById('customScale').value,
   };
   localStorage.setItem('customStyles', JSON.stringify(styles));
   localStorage.setItem('customActive', '1');
@@ -144,6 +161,9 @@ function resetCustom() {
   localStorage.removeItem('customActive');
   document.documentElement.removeAttribute('style');
   document.body.style.cssText = '';
+  // Сбрасываем масштаб
+  const main = document.querySelector('.main');
+  if (main) main.style.zoom = 1;
   closeCustomModal();
   applyThemeFromStorage();
 }
@@ -172,6 +192,10 @@ function applyCustomFromStorage() {
   if (saved.text)   { document.documentElement.style.setProperty('--text', saved.text); document.body.style.color = saved.text; }
   if (saved.radius) document.documentElement.style.setProperty('--custom-radius', saved.radius + 'px');
   if (saved.font)   document.documentElement.style.setProperty('--custom-font',   saved.font + 'px');
+  if (saved.scale)  {
+    const main = document.querySelector('.main');
+    if (main) main.style.zoom = (saved.scale / 100);
+  }
 }
 
 // Enter / Escape в модалках
@@ -188,22 +212,14 @@ document.getElementById('customModal').addEventListener('click', e => {
 });
 
 function copyLink(url, btnElement) {
-    // 1. Копируем текст
     navigator.clipboard.writeText(url).then(() => {
-        
-        // 2. Сохраняем исходный текст ОДИН РАЗ
-        const originalText = "📋 Скопировать"; // Укажите именно тот текст, который у вас в HTML
-        
-        // 3. Меняем состояние
+        const originalText = "📋 Скопировать";
         btnElement.innerText = "✅ Скопировано!";
         btnElement.classList.add("copied");
-
-        // 4. Возврат через 2 секунды
         setTimeout(() => {
             btnElement.innerText = originalText;
             btnElement.classList.remove("copied");
         }, 2000);
-        
     }).catch(err => {
         console.error('Ошибка:', err);
     });

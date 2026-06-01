@@ -56,7 +56,17 @@
         <input type="range" id="customFont" min="12" max="20" value="14" oninput="applyCustom()">
       </div>
     </div>
-    <div class="modal-btns">
+
+    <!-- Ползунок масштаба — на всю ширину под сеткой -->
+    <div class="field" style="margin-top: 8px;">
+      <label style="display:flex; justify-content:space-between;">
+        <span>Масштаб интерфейса</span>
+        <span id="scaleLabel" style="color:var(--accent); font-weight:600;">100%</span>
+      </label>
+      <input type="range" id="customScale" min="80" max="130" value="100" oninput="applyCustom()">
+    </div>
+
+    <div class="modal-btns" style="margin-top: 16px;">
       <button class="btn-secondary" onclick="resetCustom()">Сбросить</button>
       <button class="btn-primary" onclick="saveCustom()">Сохранить</button>
     </div>
@@ -121,7 +131,7 @@
     <button class="btn-join new-btn" onclick="joinCall('https://meet.google.com/pka-zrfq-zoy')">
       Присоединиться
     </button>
-    <button class="btn-copy" onclick="copyLink('https://meet.google.com/ens-nmpk-xdc', this)">
+    <button class="btn-copy" onclick="copyLink('https://meet.google.com/pka-zrfq-zoy', this)">
   📋 Скопировать
 </button>
   </div>
@@ -154,7 +164,7 @@
     <button class="btn-join" onclick="joinCall('https://meet.google.com/vww-gpxv-qwd')">
       Присоединиться
     </button>
-    <button class="btn-copy" onclick="copyLink('https://meet.google.com/ens-nmpk-xdc', this)">
+    <button class="btn-copy" onclick="copyLink('https://meet.google.com/vww-gpxv-qwd', this)">
   📋 Скопировать
 </button>
   </div>
@@ -244,7 +254,7 @@
 
         <div id="custom-part" class="sub-page">
           <h2>Кастомные стили</h2>
-          <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Настройте всё под себя — цвета, скругления, размер текста</p>
+          <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Настройте всё под себя — цвета, скругления, размер текста, масштаб</p>
           <button class="btn-primary" style="width:100%" onclick="openCustomModal()">🎨 Открыть редактор стилей</button>
           <div id="customPreview" class="custom-preview" style="margin-top:16px;display:none">
             <div class="preview-card">Предпросмотр карточки</div>
