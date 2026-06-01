@@ -809,11 +809,67 @@ function logout() {
         'currentUser'
     );
 
+    sessionStorage.removeItem(
+        'activeUser'
+    );
+
+    currentReplyUser =
+        null;
+
+    currentDialog =
+        'ideas';
+
     document
         .getElementById(
             'profileBar'
         )
         ?.remove();
+
+    const reply =
+        document.getElementById(
+            'replyDialog'
+        );
+
+    if (
+        reply
+    ) {
+
+        reply.innerHTML =
+            '';
+
+        reply.style.display =
+            'none';
+
+    }
+
+    const chat =
+        document.getElementById(
+            'chatMessages'
+        );
+
+    if (
+        chat
+    ) {
+
+        chat.innerHTML =
+            '';
+    }
+
+    document
+        .querySelectorAll(
+            '.dialog'
+        )
+        .forEach(
+
+            x => {
+
+                x.classList.remove(
+                    'active'
+                );
+
+            }
+
+        );
 
     const loginScreen =
         document
@@ -827,40 +883,36 @@ function logout() {
 
         loginScreen.style.display =
             'flex';
+
     }
 
     registerMode =
         false;
 
     const title =
-        document
-            .getElementById(
-                'authTitle'
-            );
+        document.getElementById(
+            'authTitle'
+        );
 
     const fields =
-        document
-            .getElementById(
-                'authFields'
-            );
+        document.getElementById(
+            'authFields'
+        );
 
     const action =
-        document
-            .getElementById(
-                'mainAction'
-            );
+        document.getElementById(
+            'mainAction'
+        );
 
     const switchText =
-        document
-            .getElementById(
-                'authSwitchText'
-            );
+        document.getElementById(
+            'authSwitchText'
+        );
 
     const switchBtn =
-        document
-            .getElementById(
-                'switchBtn'
-            );
+        document.getElementById(
+            'switchBtn'
+        );
 
     if (
         title
@@ -868,6 +920,7 @@ function logout() {
 
         title.textContent =
             'Вход';
+
     }
 
     if (
@@ -876,6 +929,7 @@ function logout() {
 
         fields.innerHTML =
             buildLoginFields();
+
     }
 
     if (
@@ -886,7 +940,8 @@ function logout() {
             'Войти';
 
         action.onclick =
-            () => login();
+            login;
+
     }
 
     if (
@@ -895,6 +950,7 @@ function logout() {
 
         switchText.textContent =
             'Нету аккаунта?';
+
     }
 
     if (
@@ -903,8 +959,745 @@ function logout() {
 
         switchBtn.textContent =
             'Создать аккаунт';
+
     }
+
+    location.reload();
+
 }
+
+/* ==========================
+   MESSAGES
+========================== */
+
+let currentDialog =
+    'ideas';
+
+let currentReplyUser =
+    null;
+
+
+/* ==========================
+   USER
+========================== */
+
+function getCurrentUser() {
+
+    const user =
+
+        JSON.parse(
+
+            localStorage.getItem(
+                'currentUser'
+            )
+
+        );
+
+    const currentName =
+        user?.nickname;
+
+    const previousName =
+
+        sessionStorage.getItem(
+            'activeUser'
+        );
+
+    if (
+
+        previousName !==
+        currentName
+
+    ) {
+
+        currentReplyUser =
+            null;
+
+        currentDialog =
+            'ideas';
+
+        const reply =
+            document.getElementById(
+                'replyDialog'
+            );
+
+        if (
+            reply
+        ) {
+
+            reply.innerHTML =
+                '';
+
+            reply.style.display =
+
+                currentName ===
+                'YellowYotu'
+
+                ?
+
+                'block'
+
+                :
+
+                'none';
+
+        }
+
+        const chat =
+            document.getElementById(
+                'chatMessages'
+            );
+
+        if (
+            chat
+        ) {
+
+            chat.innerHTML =
+                '';
+        }
+
+        sessionStorage.setItem(
+            'activeUser',
+            currentName
+        );
+
+    }
+
+    return user;
+
+}
+
+
+/* ==========================
+   SWITCH TAB
+========================== */
+
+async function switchDialog(
+    type
+) {
+
+    currentDialog =
+        type;
+
+    document
+        .querySelectorAll(
+            '.dialog'
+        )
+        .forEach(
+
+            dialog => {
+
+                dialog.classList.remove(
+                    'active'
+                );
+
+            }
+
+        );
+
+    event
+        ?.currentTarget
+        ?.classList
+        .add(
+            'active'
+        );
+
+    const user =
+        getCurrentUser();
+
+    if (
+
+        user
+        &&
+        user.nickname ===
+        'YellowYotu'
+
+    ) {
+
+        await loadAdminDialogs();
+
+    }
+
+    await loadMessages();
+
+}
+
+
+/* ==========================
+   SEND
+========================== */
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById(
+            'messageInput'
+        );
+
+    if (
+        !input
+    ) {
+
+        return;
+
+    }
+
+    const text =
+        input.value
+            .trim();
+
+    if (
+        !text
+    ) {
+
+        return;
+
+    }
+
+    const user =
+        getCurrentUser();
+
+    if (
+        !user
+    ) {
+
+        alert(
+            'Войдите'
+        );
+
+        return;
+
+    }
+
+    let receiver =
+        user.nickname;
+
+    if (
+
+        user.nickname ===
+        'YellowYotu'
+
+    ) {
+
+        receiver =
+            currentReplyUser;
+
+    }
+
+    await db
+        .collection(
+            'messages'
+        )
+        .add({
+
+            owner:
+                receiver,
+
+            sender:
+                user.nickname,
+
+            dialog:
+                currentDialog,
+
+            text:
+                text,
+
+            createdAt:
+                Date.now()
+
+        });
+
+    input.value =
+        '';
+
+    await loadMessages();
+
+}
+
+
+/* ==========================
+   LOAD
+========================== */
+
+async function loadMessages() {
+
+    const chat =
+        document.getElementById(
+            'chatMessages'
+        );
+
+    if (
+        !chat
+    ) {
+
+        return;
+
+    }
+
+    chat.innerHTML =
+        '';
+
+    const user =
+        getCurrentUser();
+
+    if (
+        !user
+    ) {
+
+        return;
+
+    }
+
+    let owner =
+        user.nickname;
+
+    if (
+
+        user.nickname ===
+        'YellowYotu'
+
+    ) {
+
+        owner =
+            currentReplyUser;
+
+    }
+
+    if (
+        !owner
+    ) {
+
+        chat.innerHTML =
+
+`
+<div class="msg left">
+
+Выберите диалог
+
+</div>
+`;
+
+        return;
+
+    }
+
+    const snapshot =
+
+        await db
+
+            .collection(
+                'messages'
+            )
+
+            .where(
+                'owner',
+                '==',
+                owner
+            )
+
+            .where(
+                'dialog',
+                '==',
+                currentDialog
+            )
+
+            .orderBy(
+                'createdAt'
+            )
+
+            .get();
+
+    snapshot.forEach(
+
+        doc => {
+
+            const m =
+                doc.data();
+
+            const side =
+
+                m.sender ===
+                user.nickname
+
+                ?
+
+                'right'
+
+                :
+
+                'left';
+
+            chat.innerHTML +=
+
+`
+
+<div
+class="
+msg
+${side}
+"
+>
+
+<div
+style="
+opacity:.5;
+font-size:12px;
+margin-bottom:8px;
+"
+>
+
+${m.sender}
+
+</div>
+
+${m.text}
+
+</div>
+
+`;
+
+        }
+
+    );
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+}
+
+
+/* ==========================
+   ADMIN
+========================== */
+
+async function loadAdminDialogs() {
+
+    const user =
+        getCurrentUser();
+
+    if (
+
+        !user
+
+        ||
+
+        user.nickname !==
+        'YellowYotu'
+
+    ) {
+
+        return;
+
+    }
+
+    const area =
+        document.getElementById(
+            'replyDialog'
+        );
+
+    if (
+        !area
+    ) {
+
+        return;
+
+    }
+
+    area.style.display =
+        'block';
+
+    area.innerHTML =
+        '';
+
+    const snapshot =
+
+        await db
+            .collection(
+                'messages'
+            )
+            .where(
+                'dialog',
+                '==',
+                currentDialog
+            )
+            .get();
+
+    const chats =
+        new Map();
+
+    snapshot.forEach(
+
+        doc => {
+
+            const msg =
+                doc.data();
+
+            if (
+
+                msg.sender ===
+                'YellowYotu'
+
+            ) {
+
+                return;
+
+            }
+
+            if (
+
+                !chats.has(
+                    msg.owner
+                )
+
+            ) {
+
+                chats.set(
+
+                    msg.owner,
+
+                    {
+
+                        type:
+                            msg.dialog,
+
+                        count:
+                            1
+
+                    }
+
+                );
+
+            } else {
+
+                chats.get(
+                    msg.owner
+                ).count++;
+
+            }
+
+        }
+
+    );
+
+    if (
+
+        chats.size ===
+        0
+
+    ) {
+
+        area.innerHTML =
+
+`
+
+<div
+class="
+dialog
+active
+"
+>
+
+<div
+class="
+dialog-title
+"
+>
+
+Пусто
+
+</div>
+
+<div
+class="
+dialog-sub
+"
+>
+
+Нет сообщений
+
+</div>
+
+</div>
+
+`;
+
+        return;
+
+    }
+
+    chats.forEach(
+
+        (
+            info,
+            userName
+        ) => {
+
+            area.innerHTML +=
+
+`
+
+<div
+
+class="
+dialog
+
+${
+currentReplyUser ===
+userName
+
+?
+
+'active'
+
+:
+
+''
+
+}
+"
+
+onclick="
+
+openReply(
+
+'${userName}'
+
+)
+
+"
+
+>
+
+<div
+class="
+dialog-title
+"
+>
+
+👤
+
+${userName}
+
+</div>
+
+<div
+class="
+dialog-sub
+"
+>
+
+Тип:
+
+${
+
+info.type ===
+'ideas'
+
+?
+
+'💡 Идея'
+
+:
+
+'🛠 Поддержка'
+
+}
+
+</div>
+
+<div
+class="
+dialog-sub
+"
+
+style="
+margin-top:6px;
+opacity:.45;
+"
+
+>
+
+Сообщений:
+
+${info.count}
+
+</div>
+
+</div>
+
+`;
+
+        }
+
+    );
+
+}
+
+
+/* ==========================
+   OPEN
+========================== */
+
+async function openReply(
+    nickname
+) {
+
+    currentReplyUser =
+        nickname;
+
+    document
+        .querySelectorAll(
+            '#replyDialog .dialog'
+        )
+        .forEach(
+            x =>
+            x.classList.remove(
+                'active'
+            )
+        );
+
+    event
+        ?.currentTarget
+        ?.classList
+        ?.add(
+            'active'
+        );
+
+    await loadMessages();
+
+}
+
+
+/* ==========================
+   START
+========================== */
+
+window.addEventListener(
+
+    'load',
+
+    async () => {
+
+        const user =
+            getCurrentUser();
+
+        if (
+
+            user
+            &&
+            user.nickname ===
+            'YellowYotu'
+
+        ) {
+
+            await loadAdminDialogs();
+
+        }
+
+        await loadMessages();
+
+    }
+
+);
 
 
 
