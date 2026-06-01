@@ -796,11 +796,35 @@ ${user.nickname[0].toUpperCase()}
 }
 
 window.addEventListener(
+
     'load',
-    () => {
+
+    async () => {
 
         showCurrentUser();
+
+        const user =
+            getCurrentUser();
+
+        if (
+
+            user
+            &&
+            user.nickname ===
+            'YellowYotu'
+
+        ) {
+
+            await loadAdminDialogs();
+
+        }
+
+        await loadMessages();
+
+        loadApprovedCalls();
+
     }
+
 );
 
 function logout() {
@@ -1242,12 +1266,24 @@ async function loadMessages() {
 
     const chat =
 
-        document.getElementById(
-            'chatMessages'
-        );
+        document
+            .getElementById(
+                'chatMessages'
+            );
 
     if (
         !chat
+    ) {
+
+        return;
+
+    }
+
+    const user =
+        getCurrentUser();
+
+    if (
+        !user
     ) {
 
         return;
@@ -1264,84 +1300,15 @@ async function loadMessages() {
 
     }
 
-    chat.innerHTML =
-        '';
-
-    const user =
-        getCurrentUser();
-
-    if (
-        !user
-    ) {
-
-        return;
-
-    }
-
-    let query =
+    unsubscribeMessages =
 
         db
             .collection(
                 'messages'
-            );
-
-    if (
-
-        user.nickname ===
-        'YellowYotu'
-
-        &&
-
-        currentReplyUser
-
-    ) {
-
-        query =
-
-            query
-
-                .where(
-                    'owner',
-                    '==',
-                    currentReplyUser
-                )
-
-                .where(
-                    'dialog',
-                    '==',
-                    currentDialog
-                );
-
-    }
-
-    else {
-
-        query =
-
-            query
-
-                .where(
-                    'owner',
-                    '==',
-                    user.nickname
-                )
-
-                .where(
-                    'dialog',
-                    '==',
-                    currentDialog
-                );
-
-    }
-
-    unsubscribeMessages =
-
-        query
-
+            )
             .orderBy(
                 'createdAt'
             )
-
             .onSnapshot(
 
                 snapshot => {
@@ -1361,31 +1328,55 @@ async function loadMessages() {
                                 msg.sender ===
                                 user.nickname;
 
-                            chat.innerHTML +=
+                            const visible =
 
-`
+                                user.nickname ===
+                                'YellowYotu'
 
-<div
+                                ||
 
-class="msg
+                                msg.owner ===
+                                user.nickname;
 
-${
+                            if (
+                                !visible
+                            ) {
 
-mine
+                                return;
 
-?
+                            }
 
-'right'
+                            if (
 
-:
+                                msg.dialog !==
+                                currentDialog
 
-'left'
+                            ) {
 
-}
+                                return;
 
-"
+                            }
 
->
+                            if (
+
+                                msg.type ===
+                                'callRequest'
+
+                                &&
+
+                                user.nickname ===
+                                'YellowYotu'
+
+                                &&
+
+                                currentDialog ===
+                                'support'
+
+                            ) {
+
+                                chat.innerHTML += `
+
+<div class="msg left">
 
 <div>
 
@@ -1393,9 +1384,58 @@ ${msg.text}
 
 </div>
 
+<div class="admin-call-actions">
+
+<button
+class="btn-primary"
+onclick="
+approveCallRequest(
+'${msg.callRequestId}'
+)
+">
+
+✅ Принять
+
+</button>
+
+<button
+class="btn-secondary"
+onclick="
+rejectCallRequest(
+'${msg.callRequestId}'
+)
+">
+
+❌ Отказать
+
+</button>
+
+</div>
+
 </div>
 
 `;
+
+                            }
+
+                            else {
+
+                                chat.innerHTML += `
+
+<div
+class="
+msg
+${mine ? 'right' : 'left'}
+"
+>
+
+${msg.text}
+
+</div>
+
+`;
+
+                            }
 
                         }
 
@@ -1745,7 +1785,511 @@ window.addEventListener(
 
 );
 
+function openCreateCallModal() {
 
+    document
+        .getElementById(
+            'createCallModal'
+        )
+        .classList
+        .add(
+            'open'
+        );
+
+}
+
+function closeCreateCallModal() {
+
+    document
+        .getElementById(
+            'createCallModal'
+        )
+        .classList
+        .remove(
+            'open'
+        );
+
+}
+
+async function submitCallRequest() {
+
+    const title =
+
+        document
+            .getElementById(
+                'newCallTitle'
+            )
+            .value
+            .trim();
+
+    const url =
+
+        document
+            .getElementById(
+                'newCallUrl'
+            )
+            .value
+            .trim();
+
+    if (
+
+        !title
+        ||
+
+        !url
+
+    ) {
+
+        alert(
+            'Заполните поля'
+        );
+
+        return;
+
+    }
+
+    if (
+
+        !url.includes(
+            'meet.google.com'
+        )
+
+    ) {
+
+        alert(
+            'Только Google Meet'
+        );
+
+        return;
+
+    }
+
+    const requestRef =
+
+        await db
+            .collection(
+                'callRequests'
+            )
+            .add({
+
+                title,
+
+                url,
+
+                status:
+                    'pending',
+
+                createdBy:
+                    getCurrentUser()
+                        .nickname,
+
+                createdAt:
+
+                    firebase
+                        .firestore
+                        .FieldValue
+                        .serverTimestamp()
+
+            });
+
+    await db
+        .collection(
+            'messages'
+        )
+        .add({
+
+            owner:
+                'support',
+
+            sender:
+                'SYSTEM',
+
+            dialog:
+                'support',
+
+            type:
+                'callRequest',
+
+            callRequestId:
+                requestRef.id,
+
+            text:
+
+`🔔 Новый запрос звонка
+
+Создал:
+${getCurrentUser().nickname}
+
+Название:
+${title}
+
+Ссылка:
+${url}`,
+
+            createdAt:
+
+                firebase
+                    .firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+        });
+
+    closeCreateCallModal();
+
+    alert(
+        '⏳ Ожидайте разрешения'
+    );
+
+}
+
+async function approveCall(
+    requestId
+) {
+
+    const doc =
+
+        await db
+            .collection(
+                'callRequests'
+            )
+            .doc(
+                requestId
+            )
+            .get();
+
+    const data =
+        doc.data();
+
+    await db
+        .collection(
+            'calls'
+        )
+        .add({
+
+            title:
+                data.title,
+
+            url:
+                data.url,
+
+            createdBy:
+                data.createdBy,
+
+            createdAt:
+                firebase
+                    .firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+        });
+
+    await db
+        .collection(
+            'callRequests'
+        )
+        .doc(
+            requestId
+        )
+        .update({
+
+            status:
+                'approved'
+
+        });
+
+}
+
+async function approveCallRequest(
+    requestId
+) {
+
+    const requestDoc =
+        await db
+            .collection(
+                'callRequests'
+            )
+            .doc(
+                requestId
+            )
+            .get();
+
+    if (
+        !requestDoc.exists
+    ) {
+
+        alert(
+            'Заявка не найдена'
+        );
+
+        return;
+
+    }
+
+    const request =
+        requestDoc.data();
+
+    if (
+        request.status !== 'pending'
+    ) {
+
+        alert(
+            'Заявка уже обработана'
+        );
+
+        return;
+
+    }
+
+    await db
+        .collection(
+            'calls'
+        )
+        .add({
+
+            title:
+                request.title,
+
+            url:
+                request.url,
+
+            createdBy:
+                request.createdBy,
+
+            approvedBy:
+                getCurrentUser()
+                    .nickname,
+
+            createdAt:
+                firebase
+                    .firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+        });
+
+    await db
+        .collection(
+            'callRequests'
+        )
+        .doc(
+            requestId
+        )
+        .update({
+
+            status:
+                'approved'
+
+        });
+
+    alert(
+        'Звонок разрешён'
+    );
+}
+
+async function rejectCallRequest(
+    requestId
+) {
+
+    await db
+        .collection(
+            'callRequests'
+        )
+        .doc(
+            requestId
+        )
+        .update({
+
+            status:
+                'rejected'
+
+        });
+
+    alert(
+        'Заявка отклонена'
+    );
+}
+
+
+function loadApprovedCalls() {
+
+    const grid =
+
+        document
+            .querySelector(
+                '.calls-grid'
+            );
+
+    if (
+        !grid
+    ) {
+
+        return;
+
+    }
+
+    db
+        .collection(
+            'calls'
+        )
+        .orderBy(
+            'createdAt'
+        )
+        .onSnapshot(
+
+            snapshot => {
+
+                document
+                    .querySelectorAll(
+                        '.firebase-call'
+                    )
+                    .forEach(
+
+                        x => {
+
+                            x.remove();
+
+                        }
+
+                    );
+
+                snapshot.forEach(
+
+                    doc => {
+
+                        const call =
+                            doc.data();
+
+                        grid.insertAdjacentHTML(
+
+                            'beforeend',
+
+`
+
+<div
+class="
+call-card
+firebase-call
+"
+>
+
+<div
+class="
+call-card-top
+"
+>
+
+<div
+class="
+call-badge
+"
+>
+
+🌐 Пользовательский
+
+</div>
+
+<div
+class="
+call-live
+"
+>
+
+<span
+class="
+live-dot
+"
+></span>
+
+Open
+
+</div>
+
+</div>
+
+<div
+class="
+call-card-body
+"
+>
+
+<div
+class="
+call-avatar
+"
+>
+
+💬
+
+</div>
+
+<h2>
+
+${call.title}
+
+</h2>
+
+<p>
+
+Создал:
+${call.createdBy}
+
+</p>
+
+</div>
+
+<button
+
+class="
+btn-join
+"
+
+onclick="
+joinCall(
+'${call.url}'
+)
+"
+
+>
+
+Присоединиться
+
+</button>
+
+<button
+
+class="
+btn-copy
+"
+
+onclick="
+copyLink(
+'${call.url}',
+this
+)
+"
+
+>
+
+📋 Скопировать
+
+</button>
+
+</div>
+
+`
+
+                        );
+
+                    }
+
+                );
+
+            }
+
+        );
+
+}
 
 applyThemeFromStorage();
 applyCustomFromStorage();

@@ -1291,3 +1291,19 @@ font-size:12px;
         translateY(2px);
 
 }
+
+.admin-call-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 14px;
+
+}
+
+.admin-call-actions button {
+
+    flex: 1;
+
+}

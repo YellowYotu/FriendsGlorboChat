@@ -9,7 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/x-icon" href="/icon.ico">
 </head>
+
 <body class="theme-dark">
+
+  
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
@@ -161,6 +164,15 @@
       <h1>Звонки</h1>
       <p>Выберите комнату и присоединяйтесь</p>
     </div>
+
+      <button
+        class="btn-join"
+        onclick="openCreateCallModal()"
+        >
+
+        ➕ Создать звонок
+
+    </button>
 
     <div class="calls-grid">
 
@@ -534,6 +546,79 @@ onclick="logout()"
 
 <script src="script.js"></script>
 
+
+<div
+    class="modal-overlay"
+    id="createCallModal"
+>
+
+    <div
+        class="modal modal-wide"
+    >
+
+        <h3>
+
+            Создать звонок
+
+        </h3>
+
+        <p>
+
+            После отправки нужен апрув администратора
+
+        </p>
+
+        <input
+            id="newCallTitle"
+
+            type="text"
+
+            placeholder="Название"
+        >
+
+        <br><br>
+
+        <input
+            id="newCallUrl"
+
+            type="text"
+
+            placeholder="https://meet.google.com/..."
+        >
+
+        <div
+            class="modal-btns"
+        >
+
+            <button
+                class="btn-secondary"
+
+                onclick="
+                    closeCreateCallModal()
+                "
+            >
+
+                Отмена
+
+            </button>
+
+            <button
+                class="btn-primary"
+
+                onclick="
+                    submitCallRequest()
+                "
+            >
+
+                Отправить
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
   
 </body>
 </html>
