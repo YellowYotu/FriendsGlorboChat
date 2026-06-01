@@ -1160,10 +1160,6 @@ async function sendMessage() {
         !user
     ) {
 
-        alert(
-            'Войдите'
-        );
-
         return;
 
     }
@@ -1178,38 +1174,60 @@ async function sendMessage() {
 
     ) {
 
+        if (
+            !currentReplyUser
+        ) {
+
+            alert(
+                'Выберите чат'
+            );
+
+            return;
+
+        }
+
         receiver =
             currentReplyUser;
 
     }
 
-    await db
-        .collection(
-            'messages'
-        )
-        .add({
+    try {
 
-            owner:
-                receiver,
+        await db
+            .collection(
+                'messages'
+            )
+            .add({
 
-            sender:
-                user.nickname,
+                owner:
+                    receiver,
 
-            dialog:
-                currentDialog,
+                sender:
+                    user.nickname,
 
-            text:
-                text,
+                dialog:
+                    currentDialog,
 
-            createdAt:
-                Date.now()
+                text:
+                    text,
 
-        });
+                createdAt:
+                    firebase.firestore.FieldValue.serverTimestamp()
 
-    input.value =
-        '';
+            });
 
-    await loadMessages();
+        input.value =
+            '';
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            error
+        );
+
+    }
 
 }
 
