@@ -1262,3 +1262,32 @@ font-size:12px;
         transparent;
 
 }
+
+.brand::before {
+
+    content: "";
+
+    display: inline-block;
+
+    width: 18px;
+
+    height: 18px;
+
+    margin-right: 4px;
+
+    background-image:
+        url("icon.ico");
+
+    background-size:
+        contain;
+
+    background-repeat:
+        no-repeat;
+
+    vertical-align:
+        middle;
+
+    transform:
+        translateY(2px);
+
+}
