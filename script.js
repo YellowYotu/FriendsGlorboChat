@@ -23,7 +23,17 @@ function loadVersion() {
         });
 }
 
-function showSub(id, btn) {
+function loadUserCount() {
+    db.collection('users').get().then(snap => {
+        const el = document.getElementById('infoUserCount');
+        if (el) el.innerText = snap.size;
+    }).catch(() => {
+        const el = document.getElementById('infoUserCount');
+        if (el) el.innerText = '?';
+    });
+}
+
+
   document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -2300,3 +2310,4 @@ applyCustomFromStorage();
 
 // Запускаем
 loadVersion();
+loadUserCount();
