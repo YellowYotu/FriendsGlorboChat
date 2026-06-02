@@ -303,6 +303,79 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
   font-size: var(--custom-font, 14px); font-weight: 600; cursor: pointer;
 }
 
+/* ── INFO PAGE ── */
+.info-version-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 48px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.info-version-label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.info-version-number {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -3px;
+  line-height: 1;
+}
+
+.info-roblox-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 480px;
+}
+.info-roblox-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.roblox-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+.info-roblox-body {
+  padding: 24px;
+}
+.roblox-group-name {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.info-roblox-desc {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.info-roblox-btn {
+  display: inline-flex;
+  margin: 0;
+  width: auto;
+  padding: 13px 28px;
+  text-decoration: none;
+}
+
 /* ── VERSION ── */
 .version-tag {
   position: fixed; bottom: 15px; right: 15px;

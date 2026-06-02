@@ -12,10 +12,14 @@ function loadVersion() {
         .then(data => {
             const el = document.getElementById('versionDisplay');
             if (el) el.innerText = 'version: ' + data.version;
+            const elInfo = document.getElementById('infoVersionDisplay');
+            if (elInfo) elInfo.innerText = data.version;
         })
         .catch(() => {
             const el = document.getElementById('versionDisplay');
             if (el) el.innerText = 'version: ???';
+            const elInfo = document.getElementById('infoVersionDisplay');
+            if (elInfo) elInfo.innerText = '???';
         });
 }
 
