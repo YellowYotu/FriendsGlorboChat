@@ -374,12 +374,20 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
 }
 
 
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  overflow: hidden;
-  max-width: 480px;
+.info-roblox-card {
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    max-width: 480px;
+
 }
+
 .info-roblox-header {
   display: flex;
   align-items: center;

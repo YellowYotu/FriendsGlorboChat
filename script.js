@@ -34,10 +34,31 @@ function loadUserCount() {
 }
 
 
-  document.querySelectorAll('.sub-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if (btn) btn.classList.add('active');
+function showSubPage(id, btn) {
+
+    document
+        .querySelectorAll('.sub-page')
+        .forEach(p => {
+            p.classList.remove('active');
+        });
+
+    document
+        .querySelectorAll('.sub-btn')
+        .forEach(b => {
+            b.classList.remove('active');
+        });
+
+    const page =
+        document.getElementById(id);
+
+    if (page) {
+        page.classList.add('active');
+    }
+
+    if (btn) {
+        btn.classList.add('active');
+    }
+
 }
 
 // ── ТЕМЫ ──
