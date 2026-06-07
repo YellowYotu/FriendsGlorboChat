@@ -197,11 +197,65 @@
   <!-- Таблица пользователей -->
   <div class="settings-layout">
     <div class="settings-nav">
+      <button class="sub-btn" onclick="showSubPage('admin-site', this); loadAdminSitePage()">🌐 Сайт</button>
       <button class="sub-btn active" onclick="showSubPage('admin-users', this)">👥 Юзеры</button>
       <button class="sub-btn" onclick="showSubPage('admin-calls', this)">📞 Заявки</button>
       <button class="sub-btn" onclick="showSubPage('admin-allcalls', this)">✅ Звонки</button>
     </div>
     <div class="settings-panel">
+
+              <div id="admin-site" class="sub-page">
+          <h2>Управление сайтом</h2>
+
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+            <span style="color:var(--muted); font-size:13px;">Статус:</span>
+            <span id="adminSiteStatus" style="font-weight:600;">—</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">
+                ⏰ Включить автоматически в (оставь пустым = вручную)
+              </label>
+              <input
+                id="adminSiteTimeInput"
+                type="datetime-local"
+                style="
+                  width:100%; padding:10px 14px;
+                  background:var(--bg); border:1px solid var(--border);
+                  border-radius:10px; color:var(--text); font-size:14px; outline:none;
+                "
+              >
+            </div>
+
+            <div>
+              <label style="font-size:12px; color:var(--muted); display:block; margin-bottom:6px;">
+                💬 Причина (необязательно)
+              </label>
+              <input
+                id="adminSiteReason"
+                type="text"
+                placeholder="Тех. работы..."
+                style="
+                  width:100%; padding:10px 14px;
+                  background:var(--bg); border:1px solid var(--border);
+                  border-radius:10px; color:var(--text); font-size:14px; outline:none;
+                "
+              >
+            </div>
+
+          </div>
+
+          <button
+            id="adminSiteToggleBtn"
+            class="btn-primary"
+            style="width:100%; padding:14px; font-size:15px;"
+            onclick="adminToggleSite()"
+          >
+            —
+          </button>
+        </div>
 
       <!-- ЮЗЕРЫ -->
       <div id="admin-users" class="sub-page active">

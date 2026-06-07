@@ -1042,6 +1042,8 @@ window.addEventListener(
 
         initAdminNav(); // показывает/скрывает кнопку в сайдбаре
 
+        initSiteStatus();
+
     }
     
 
@@ -2483,6 +2485,289 @@ this
 
         );
 
+}
+
+
+/* ==========================
+   SITE STATUS
+========================== */
+
+let siteStatusUnsubscribe = null;
+
+function initSiteStatus() {
+  siteStatusUnsubscribe = db.collection('siteConfig').doc('status')
+    .onSnapshot(doc => {
+      if (!doc.exists) return;
+      const data = doc.data();
+      handleSiteStatus(data);
+    });
+}
+
+function handleSiteStatus(data) {
+  const user = getCurrentUser();
+  const isAdmin = user?.nickname === 'YellowYotu';
+
+  // Если сайт включён — убираем всё
+  if (data.enabled) {
+    document.getElementById('siteDisabledOverlay')?.remove();
+    document.getElementById('adminSiteBanner')?.remove();
+    return;
+  }
+
+  // Проверяем авто-включение по времени
+  if (data.enableAt) {
+    const now = Date.now();
+    const enableAt = data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt;
+    if (now >= enableAt) {
+      // Время вышло — включаем
+      db.collection('siteConfig').doc('status').update({ enabled: true });
+      return;
+    }
+  }
+
+  if (isAdmin) {
+    showAdminSiteBanner(data);
+  } else {
+    showSiteDisabledOverlay(data);
+  }
+}
+
+function showAdminSiteBanner(data) {
+  document.getElementById('adminSiteBanner')?.remove();
+
+  const enableAt = data.enableAt
+    ? (data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt)
+    : null;
+
+  const timeStr = enableAt
+    ? `до ${new Date(enableAt).toLocaleString('ru')}`
+    : 'вручную';
+
+  const banner = document.createElement('div');
+  banner.id = 'adminSiteBanner';
+  banner.innerHTML = `⚠️ САЙТ ВЫКЛЮЧЕН (${timeStr})`;
+  banner.style.cssText = `
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(248,81,73,0.15);
+    border: 1px solid #f85149;
+    color: #f85149;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 99999;
+    pointer-events: none;
+    letter-spacing: 0.03em;
+  `;
+  document.body.appendChild(banner);
+}
+
+function showSiteDisabledOverlay(data) {
+  if (document.getElementById('siteDisabledOverlay')) return;
+
+  const disabledAt = data.disabledAt
+    ? (data.disabledAt.toMillis ? data.disabledAt.toMillis() : data.disabledAt)
+    : null;
+
+  const enableAt = data.enableAt
+    ? (data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt)
+    : null;
+
+  const disabledAtStr = disabledAt
+    ? new Date(disabledAt).toLocaleString('ru')
+    : '—';
+
+  const enableAtStr = enableAt
+    ? new Date(enableAt).toLocaleString('ru')
+    : 'Вручную администратором';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'siteDisabledOverlay';
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 999999999;
+    background: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    user-select: none;
+  `;
+
+  overlay.innerHTML = `
+    <div style="
+      text-align: center;
+      max-width: 480px;
+      padding: 48px 32px;
+      background: #161b22;
+      border: 1px solid rgba(248,81,73,0.3);
+      border-radius: 28px;
+      box-shadow: 0 0 80px rgba(248,81,73,0.15);
+    ">
+      <div style="font-size: 64px; margin-bottom: 16px;">🔴</div>
+      <div style="
+        font-size: 32px;
+        font-weight: 800;
+        color: #f85149;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+      ">САЙТ ВЫКЛЮЧЕН</div>
+      <div style="
+        font-size: 15px;
+        color: #7d8590;
+        margin-bottom: 32px;
+        line-height: 1.6;
+      ">Сайт временно недоступен.<br>Приносим извинения за неудобства.</div>
+
+      <div style="
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: left;
+      ">
+        <div style="font-size: 11px; color: #7d8590; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; margin-bottom: 4px;">📊 Статистика</div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#7d8590; font-size:13px;">Статус</span>
+          <span style="
+            background: rgba(248,81,73,0.12);
+            color: #f85149;
+            border: 1px solid rgba(248,81,73,0.25);
+            border-radius: 999px;
+            padding: 3px 12px;
+            font-size: 12px;
+            font-weight: 700;
+          ">● Выключен</span>
+        </div>
+
+        <div style="height:1px; background:rgba(255,255,255,0.05);"></div>
+
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#7d8590; font-size:13px;">Выключен в</span>
+          <span style="color:#e6edf3; font-size:13px; font-weight:600;">${disabledAtStr}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#7d8590; font-size:13px;">Включится в</span>
+          <span style="color:#e6edf3; font-size:13px; font-weight:600;">${enableAtStr}</span>
+        </div>
+
+        ${enableAt ? `
+        <div style="height:1px; background:rgba(255,255,255,0.05);"></div>
+        <div id="siteCountdown" style="text-align:center; color:#58a6ff; font-size:14px; font-weight:600;"></div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  // Блокируем любые попытки убрать
+  overlay.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.body.appendChild(overlay);
+
+  // Таймер обратного отсчёта
+  if (enableAt) {
+    startCountdown(enableAt);
+  }
+}
+
+function startCountdown(enableAtMs) {
+  const el = document.getElementById('siteCountdown');
+  if (!el) return;
+
+  const interval = setInterval(() => {
+    const remaining = enableAtMs - Date.now();
+    if (remaining <= 0) {
+      clearInterval(interval);
+      el.textContent = 'Включается...';
+      return;
+    }
+
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+
+    el.textContent = `⏱ До включения: ${h > 0 ? h + 'ч ' : ''}${m}м ${s}с`;
+  }, 1000);
+}
+
+/* ==========================
+   ADMIN — SITE TAB
+========================== */
+
+function loadAdminSitePage() {
+  db.collection('siteConfig').doc('status').get().then(doc => {
+    const data = doc.exists ? doc.data() : { enabled: true };
+
+    const statusEl = document.getElementById('adminSiteStatus');
+    const toggleBtn = document.getElementById('adminSiteToggleBtn');
+
+    if (!statusEl || !toggleBtn) return;
+
+    if (data.enabled) {
+      statusEl.innerHTML = `<span style="color:#3fb950">● Включён</span>`;
+      toggleBtn.textContent = '🔴 Выключить сайт';
+      toggleBtn.style.background = 'linear-gradient(135deg,#f85149,#b91c1c)';
+    } else {
+      const enableAt = data.enableAt
+        ? (data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt)
+        : null;
+      const timeStr = enableAt ? new Date(enableAt).toLocaleString('ru') : 'вручную';
+      statusEl.innerHTML = `<span style="color:#f85149">● Выключен</span> <span style="color:#7d8590;font-size:12px">(до ${timeStr})</span>`;
+      toggleBtn.textContent = '🟢 Включить сайт';
+      toggleBtn.style.background = 'linear-gradient(135deg,#56d364,#0d9e3e)';
+    }
+  });
+}
+
+async function adminToggleSite() {
+  const doc = await db.collection('siteConfig').doc('status').get();
+  const data = doc.exists ? doc.data() : { enabled: true };
+
+  if (data.enabled) {
+    // Выключаем — читаем поля
+    const timeInput = document.getElementById('adminSiteTimeInput').value.trim();
+    const reason = document.getElementById('adminSiteReason').value.trim();
+
+    let enableAt = null;
+
+    if (timeInput) {
+      const parsed = new Date(timeInput);
+      if (isNaN(parsed)) {
+        alert('Неверный формат времени');
+        return;
+      }
+      enableAt = parsed.getTime();
+    }
+
+    await db.collection('siteConfig').doc('status').set({
+      enabled: false,
+      disabledAt: firebase.firestore.FieldValue.serverTimestamp(),
+      enableAt: enableAt,
+      reason: reason || ''
+    });
+
+    alert('Сайт выключен');
+  } else {
+    // Включаем
+    await db.collection('siteConfig').doc('status').set({
+      enabled: true,
+      enableAt: null,
+      disabledAt: null,
+      reason: ''
+    });
+    alert('Сайт включён');
+  }
+
+  loadAdminSitePage();
 }
 
 applyThemeFromStorage();
