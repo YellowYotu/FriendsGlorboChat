@@ -8,6 +8,13 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
+.info-roblox-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
 /* ── ТЕМЫ ── */
 .theme-dark {
   --bg: #0d1117; --surface: #161b22; --surface2: #1c2333;
@@ -289,6 +296,7 @@ nav { display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 8px
 .sunset-prev { background: #1a0a00; }
 .sunset-prev .prev-sidebar { background: #2d1200; }
 .sunset-prev .prev-card    { background: #3d1a00; }
+
 
 /* ── CUSTOM PREVIEW ── */
 .custom-preview { display: flex; flex-direction: column; gap: 10px; }

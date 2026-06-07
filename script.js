@@ -4,6 +4,8 @@ function showPage(id, btn) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
+
+    if (id === 'admin') loadAdminPage();
 }
 
 function loadVersion() {
@@ -59,6 +61,186 @@ function showSubPage(id, btn) {
         btn.classList.add('active');
     }
 
+}
+
+/* ==========================
+   ADMIN PAGE
+========================== */
+
+function initAdminNav() {
+  const user = getCurrentUser();
+  const btn = document.getElementById('adminNavBtn');
+  if (btn) btn.style.display = (user?.nickname === 'YellowYotu') ? 'flex' : 'none';
+}
+
+function loadAdminPage() {
+  const user = getCurrentUser();
+  if (user?.nickname !== 'YellowYotu') return;
+
+  loadAdminStats();
+  loadAdminUsers();
+  loadAdminRequests();
+  loadAdminCalls();
+}
+
+function loadAdminStats() {
+  // Юзеры
+  db.collection('users').get().then(s => {
+    const el = document.getElementById('adminUserCount');
+    if (el) el.innerText = s.size;
+  });
+
+  // Звонки
+  db.collection('calls').get().then(s => {
+    const el = document.getElementById('adminCallCount');
+    if (el) el.innerText = s.size;
+  });
+
+  // Заявки pending
+  db.collection('callRequests').where('status', '==', 'pending').get().then(s => {
+    const el = document.getElementById('adminPendingCount');
+    if (el) el.innerText = s.size;
+  });
+}
+
+function loadAdminUsers() {
+  const list = document.getElementById('adminUsersList');
+  if (!list) return;
+
+  db.collection('users').orderBy('createdAt').get().then(snap => {
+    list.innerHTML = '';
+    if (snap.empty) {
+      list.innerHTML = '<p style="color:var(--muted)">Нет пользователей</p>';
+      return;
+    }
+    snap.forEach(doc => {
+      const u = doc.data();
+      const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('ru') : '—';
+      list.innerHTML += `
+        <div style="
+          background:var(--surface);
+          border-radius:10px;
+          padding:12px 16px;
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+        ">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="
+              width:36px;height:36px;
+              background:var(--accent);
+              border-radius:50%;
+              display:flex;align-items:center;justify-content:center;
+              font-weight:700;font-size:15px;color:#000;
+            ">${u.nickname[0].toUpperCase()}</div>
+            <div>
+              <div style="font-weight:600">${u.nickname}</div>
+              <div style="font-size:12px;color:var(--muted)">Зарег.: ${date}</div>
+            </div>
+          </div>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px"
+            onclick="adminDeleteUser('${doc.id}', '${u.nickname}')">
+            🗑 Удалить
+          </button>
+        </div>
+      `;
+    });
+  });
+}
+
+function loadAdminRequests() {
+  const list = document.getElementById('adminRequestsList');
+  if (!list) return;
+
+  db.collection('callRequests').orderBy('createdAt', 'desc').onSnapshot(snap => {
+    list.innerHTML = '';
+    if (snap.empty) {
+      list.innerHTML = '<p style="color:var(--muted)">Нет заявок</p>';
+      return;
+    }
+    snap.forEach(doc => {
+      const r = doc.data();
+      const statusMap = { pending: '⏳ Ожидает', approved: '✅ Одобрен', rejected: '❌ Отклонён' };
+      const statusColor = { pending: 'var(--accent)', approved: '#3fb950', rejected: '#f85149' };
+      list.innerHTML += `
+        <div style="
+          background:var(--surface);
+          border-radius:10px;
+          padding:14px 16px;
+          border-left:3px solid ${statusColor[r.status] || 'var(--accent)'};
+        ">
+          <div style="font-weight:600;margin-bottom:4px">${r.title}</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px">
+            👤 ${r.createdBy} · <span style="color:${statusColor[r.status]}">${statusMap[r.status] || r.status}</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);word-break:break-all;margin-bottom:10px">${r.url}</div>
+          ${r.status === 'pending' ? `
+            <div style="display:flex;gap:8px">
+              <button class="btn-primary" style="font-size:12px;padding:5px 12px"
+                onclick="approveCallRequest('${doc.id}')">✅ Одобрить</button>
+              <button class="btn-secondary" style="font-size:12px;padding:5px 12px"
+                onclick="rejectCallRequest('${doc.id}')">❌ Отклонить</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+  });
+}
+
+function loadAdminCalls() {
+  const list = document.getElementById('adminCallsList');
+  if (!list) return;
+
+  db.collection('calls').orderBy('createdAt', 'desc').onSnapshot(snap => {
+    list.innerHTML = '';
+    if (snap.empty) {
+      list.innerHTML = '<p style="color:var(--muted)">Нет звонков</p>';
+      return;
+    }
+    snap.forEach(doc => {
+      const c = doc.data();
+      list.innerHTML += `
+        <div style="
+          background:var(--surface);
+          border-radius:10px;
+          padding:14px 16px;
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+        ">
+          <div>
+            <div style="font-weight:600">${c.title}</div>
+            <div style="font-size:12px;color:var(--muted)">👤 ${c.createdBy}</div>
+            <div style="font-size:11px;color:var(--muted);word-break:break-all">${c.url}</div>
+          </div>
+          <button class="btn-secondary" style="font-size:12px;padding:4px 10px;flex-shrink:0"
+            onclick="adminDeleteCall('${doc.id}')">
+            🗑
+          </button>
+        </div>
+      `;
+    });
+  });
+}
+
+async function adminDeleteUser(docId, nickname) {
+  if (nickname === 'YellowYotu') {
+    alert('Нельзя удалить себя');
+    return;
+  }
+  if (!confirm(`Удалить пользователя ${nickname}?`)) return;
+  await db.collection('users').doc(docId).delete();
+  loadAdminUsers();
+  loadAdminStats();
+}
+
+async function adminDeleteCall(docId) {
+  if (!confirm('Удалить этот звонок?')) return;
+  await db.collection('calls').doc(docId).delete();
+  loadAdminStats();
 }
 
 // ── ТЕМЫ ──
@@ -858,7 +1040,10 @@ window.addEventListener(
 
         loadApprovedCalls();
 
+        initAdminNav(); // показывает/скрывает кнопку в сайдбаре
+
     }
+    
 
 );
 
@@ -1792,33 +1977,7 @@ async function openReply(
    START
 ========================== */
 
-window.addEventListener(
 
-    'load',
-
-    async () => {
-
-        const user =
-            getCurrentUser();
-
-        if (
-
-            user
-            &&
-            user.nickname ===
-            'YellowYotu'
-
-        ) {
-
-            await loadAdminDialogs();
-
-        }
-
-        await loadMessages();
-
-    }
-
-);
 
 function openCreateCallModal() {
 

@@ -158,10 +158,72 @@
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
       <span>Инфо</span>
     </button>
+
+    <button class="nav-btn" id="adminNavBtn" onclick="showPage('admin', this)" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.5 6.8-5 7.93-2.5-1.13-5-4.43-5-7.93V7.18L12 5z"/></svg>
+      <span>Админ</span>
+    </button>
   </nav>
 </div>
 
 <div class="main">
+
+  <!-- АДМИН -->
+<div id="admin" class="page">
+  <div class="page-header">
+    <h1>⚙️ Админ-панель</h1>
+    <p>Только для администратора</p>
+  </div>
+
+  <!-- Статы -->
+  <div class="info-cards-row" style="margin-bottom:24px">
+    <div class="info-stat-card">
+      <div class="info-stat-icon">👥</div>
+      <div class="info-stat-label">Пользователей</div>
+      <div class="info-stat-number" id="adminUserCount">...</div>
+    </div>
+    <div class="info-stat-card">
+      <div class="info-stat-icon">📞</div>
+      <div class="info-stat-label">Звонков</div>
+      <div class="info-stat-number" id="adminCallCount">...</div>
+    </div>
+    <div class="info-stat-card">
+      <div class="info-stat-icon">⏳</div>
+      <div class="info-stat-label">Заявок</div>
+      <div class="info-stat-number" id="adminPendingCount">...</div>
+    </div>
+  </div>
+
+  <!-- Таблица пользователей -->
+  <div class="settings-layout">
+    <div class="settings-nav">
+      <button class="sub-btn active" onclick="showSubPage('admin-users', this)">👥 Юзеры</button>
+      <button class="sub-btn" onclick="showSubPage('admin-calls', this)">📞 Заявки</button>
+      <button class="sub-btn" onclick="showSubPage('admin-allcalls', this)">✅ Звонки</button>
+    </div>
+    <div class="settings-panel">
+
+      <!-- ЮЗЕРЫ -->
+      <div id="admin-users" class="sub-page active">
+        <h2>Пользователи</h2>
+        <div id="adminUsersList" style="display:flex;flex-direction:column;gap:8px;margin-top:12px"></div>
+      </div>
+
+      <!-- ЗАЯВКИ -->
+      <div id="admin-calls" class="sub-page">
+        <h2>Заявки на звонки</h2>
+        <div id="adminRequestsList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
+      </div>
+
+      <!-- ЗВОНКИ -->
+      <div id="admin-allcalls" class="sub-page">
+        <h2>Активные звонки</h2>
+        <div id="adminCallsList" style="display:flex;flex-direction:column;gap:10px;margin-top:12px"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
   <!-- ЗВОНКИ -->
   <div id="calls" class="page active">
