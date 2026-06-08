@@ -2606,12 +2606,7 @@ function showSiteDisabledOverlay(data) {
 
   <div style="height:1px; background:rgba(255,255,255,0.05);"></div>
 
-<div style="display:flex; justify-content:space-between; gap:16px;">
-  <span style="color:#7d8590; font-size:13px;">Причина</span>
-  <span style="color:#e6edf3; font-size:13px; font-weight:600; text-align:right;">
-    ${reason}
-  </span>
-</div>
+
     <div style="
       text-align: center;
       max-width: 480px;
@@ -2660,6 +2655,27 @@ function showSiteDisabledOverlay(data) {
             font-weight: 700;
           ">● Выключен</span>
         </div>
+
+        <div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:16px;
+">
+  <span style="color:#7d8590;">Причина</span>
+
+  <span
+    class="reason-text"
+    style="
+      color:#fff;
+      text-align:right;
+      max-width:220px;
+      word-break:break-word;
+    "
+  >
+    ${reason}
+  </span>
+</div>
 
         <div style="height:1px; background:rgba(255,255,255,0.05);"></div>
 
