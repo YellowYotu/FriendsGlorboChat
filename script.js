@@ -2566,7 +2566,7 @@ function showAdminSiteBanner(data) {
 }
 
 function showSiteDisabledOverlay(data) {
-  document.getElementById('siteDisabledOverlay')?.remove();
+  if (document.getElementById('siteDisabledOverlay')) return;
 
   const disabledAt = data.disabledAt
     ? (data.disabledAt.toMillis ? data.disabledAt.toMillis() : data.disabledAt)
@@ -2576,9 +2576,13 @@ function showSiteDisabledOverlay(data) {
     ? (data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt)
     : null;
 
-  const reason = data.reason && data.reason.trim()
-    ? data.reason.trim()
-    : 'Причина не указана';
+  const disabledAtStr = disabledAt
+    ? new Date(disabledAt).toLocaleString('ru')
+    : '—';
+
+    const reason = data.reason && data.reason.trim()
+  ? data.reason.trim()
+  : 'Причина не указана';
 
   const enableAtStr = enableAt
     ? new Date(enableAt).toLocaleString('ru')
