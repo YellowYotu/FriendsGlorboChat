@@ -115,7 +115,12 @@ function loadAdminUsers() {
     }
     snap.forEach(doc => {
       const u = doc.data();
-      const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('ru') : '—';
+        const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('ru') : '—';
+        const lastSeenMs = u.lastSeen ? (u.lastSeen.toMillis ? u.lastSeen.toMillis() : u.lastSeen) : null;
+        const lastSeenStr = lastSeenMs ? new Date(lastSeenMs).toLocaleString('ru') : 'никогда';
+        const onlineBadge = u.online === true
+        ? `<span style="color:#3fb950;font-weight:600;font-size:11px">● онлайн</span>`
+        : `<span style="color:#7d8590;font-size:11px">● был: ${lastSeenStr}</span>`;
       list.innerHTML += `
         <div style="
           background:var(--surface);
@@ -135,8 +140,9 @@ function loadAdminUsers() {
               font-weight:700;font-size:15px;color:#000;
             ">${u.nickname[0].toUpperCase()}</div>
             <div>
-              <div style="font-weight:600">${u.nickname}</div>
-              <div style="font-size:12px;color:var(--muted)">Зарег.: ${date}</div>
+                <div style="font-weight:600">${u.nickname}</div>
+                <div style="font-size:12px;color:var(--muted)">Зарег.: ${date}</div>
+                <div style="margin-top:2px">${onlineBadge}</div>
             </div>
           </div>
           <button class="btn-secondary" style="font-size:12px;padding:4px 10px"
@@ -868,12 +874,15 @@ async function login() {
 
         localStorage.setItem(
             'currentUser',
-            JSON.stringify(
-                user
-            )
+            JSON.stringify({
+                ...user,
+                docId: result.docs[0].id
+            })
         );
 
         showCurrentUser();
+
+        startOnlineTracking();
 
     } catch (
         error
@@ -1043,6 +1052,8 @@ window.addEventListener(
         initAdminNav(); // показывает/скрывает кнопку в сайдбаре
 
         initSiteStatus();
+
+        startOnlineTracking();
 
     }
     
@@ -1312,6 +1323,36 @@ function getCurrentUser() {
 
     return user;
 
+}
+
+function startOnlineTracking() {
+  const user = getCurrentUser();
+  if (!user?.docId) return;
+
+  const ref = db.collection('users').doc(user.docId);
+
+  const markOnline = () => ref.update({
+    online: true,
+    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  const markOffline = () => ref.update({
+    online: false,
+    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  markOnline();
+
+  const interval = setInterval(markOnline, 30000);
+
+  document.addEventListener('visibilitychange', () => {
+    document.hidden ? markOffline() : markOnline();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    clearInterval(interval);
+    markOffline();
+  });
 }
 
 
