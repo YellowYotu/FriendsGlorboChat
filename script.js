@@ -2566,7 +2566,7 @@ function showAdminSiteBanner(data) {
 }
 
 function showSiteDisabledOverlay(data) {
-  if (document.getElementById('siteDisabledOverlay')) return;
+  document.getElementById('siteDisabledOverlay')?.remove();
 
   const disabledAt = data.disabledAt
     ? (data.disabledAt.toMillis ? data.disabledAt.toMillis() : data.disabledAt)
@@ -2576,9 +2576,9 @@ function showSiteDisabledOverlay(data) {
     ? (data.enableAt.toMillis ? data.enableAt.toMillis() : data.enableAt)
     : null;
 
-  const disabledAtStr = disabledAt
-    ? new Date(disabledAt).toLocaleString('ru')
-    : '—';
+  const reason = data.reason && data.reason.trim()
+    ? data.reason.trim()
+    : 'Причина не указана';
 
   const enableAtStr = enableAt
     ? new Date(enableAt).toLocaleString('ru')
@@ -2599,6 +2599,15 @@ function showSiteDisabledOverlay(data) {
   `;
 
   overlay.innerHTML = `
+
+  <div style="height:1px; background:rgba(255,255,255,0.05);"></div>
+
+<div style="display:flex; justify-content:space-between; gap:16px;">
+  <span style="color:#7d8590; font-size:13px;">Причина</span>
+  <span style="color:#e6edf3; font-size:13px; font-weight:600; text-align:right;">
+    ${reason}
+  </span>
+</div>
     <div style="
       text-align: center;
       max-width: 480px;
