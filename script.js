@@ -35,6 +35,58 @@ function loadUserCount() {
     });
 }
 
+// ── АВАТАР ──
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64 = e.target.result;
+    localStorage.setItem('userAvatar', base64);
+    applyAvatar(base64);
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyAvatar(base64) {
+  const img = document.getElementById('avatarImg');
+  const initial = document.getElementById('avatarInitial');
+  const profileAvatar = document.getElementById('profileAvatar');
+
+  if (img && base64) {
+    img.src = base64;
+    img.style.display = 'block';
+    if (initial) initial.style.display = 'none';
+  }
+
+  // Обновляем аватар в profileBar (верхний правый угол)
+  if (profileAvatar && base64) {
+    profileAvatar.innerHTML = `<img src="${base64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  }
+}
+
+function removeAvatar() {
+  localStorage.removeItem('userAvatar');
+  const img = document.getElementById('avatarImg');
+  const initial = document.getElementById('avatarInitial');
+  const profileAvatar = document.getElementById('profileAvatar');
+  const user = getCurrentUser();
+
+  if (img) { img.src = ''; img.style.display = 'none'; }
+  if (initial) { initial.style.display = ''; }
+  if (profileAvatar && user) profileAvatar.innerHTML = user.nickname[0].toUpperCase();
+}
+
+function loadAvatarInSettings() {
+  const user = getCurrentUser();
+  const initial = document.getElementById('avatarInitial');
+  if (initial && user) initial.textContent = user.nickname[0].toUpperCase();
+
+  const saved = localStorage.getItem('userAvatar');
+  if (saved) applyAvatar(saved);
+}
+
 
 function showSubPage(id, btn) {
 
@@ -60,6 +112,8 @@ function showSubPage(id, btn) {
     if (btn) {
         btn.classList.add('active');
     }
+
+    if (id === 'account-part') loadAvatarInSettings();
 
 }
 
@@ -969,6 +1023,11 @@ function showCurrentUser() {
     ) {
         return;
     }
+
+     const savedAvatar = localStorage.getItem('userAvatar');
+         if (savedAvatar) {
+        setTimeout(() => applyAvatar(savedAvatar), 0);
+     }
 
     const user =
         JSON.parse(
